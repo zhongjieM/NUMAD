@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="edu.neu.madcourse.zhongjiemao"
+    android:versionCode="2"
+    android:versionName="2.0" >
+
+    <!-- To allow to read the phone's information such as IMEI -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!--
+     This part is required by the assignment 1 to 
+	 !	 ensure that my application will only run on 
+	 !   specific phones that we authorize.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_DATA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
+
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="7" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/even_icon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+
+        <!-- This part is not copied from Sudoku Game. -->
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.Assignment1"
+            android:label="@string/title_activity_assignment1"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.TeamMembers"
+            android:label="@string/title_activity_team_members"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <!-- This part is copied from Sudoku Game. -->
+        <!-- Here are four ACTIVITIES copied from Sudoku Game. -->
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.sudoku.Sudoku"
+            android:label="@string/main_title" >
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.sudoku.About"
+            android:label="@string/about_title"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.sudoku.Prefs"
+            android:label="@string/settings_title" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.sudoku.Game"
+            android:label="@string/game_title" />
+
+        <!-- FORCE THE SCREEN OF THIS ACTIVITY NOT TO BE ROTATE -->
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.boggle.BoggleGame"
+            android:label="@string/title_activity_boggle_game"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.boggle.BoggleMain"
+            android:label="@string/title_activity_boggle_main"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.boggle.BoggleAcknowledgement"
+            android:label="@string/title_activity_boggle_acknowledgement"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.boggle.BoggleAbout"
+            android:label="@string/title_activity_boggle_about"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
+    </application>
+
+</manifest>
