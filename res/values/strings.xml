@@ -10,6 +10,8 @@
     <string name="title_activity_team_members">Team Members</string>
     <string name="btn_team_member_activity_assignment1">Team Members</string>
     <string name="btn_sudoku_activity_assignment1">Sudoku</string>
+    <string name="btn_boggle_game">Boggle</string>
+    <string name="btn_persistent_boggle">Persistent Boggle</string>
     <string name="btn_error_check_activity_assignment1">Error Check</string>
     <string name="btn_exit_activity_assignment1">Exit</string>
     <string name="txt_designer_name_activity_team_member">Zhongjie Mao</string>
@@ -46,12 +48,14 @@ objective is to fill the grid so that each
 row, each column, and each of the 3x3 boxes
 (also called <i>blocks</i>) contains the digits
 1 to 9 exactly once.</string>
+
+    <!-- End of the part -->
+
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_boggle_game">BoggleGame</string>
     <string name="title_activity_boggle_main">BoggleMain</string>
     <string name="title_activity_boggle_acknowledgement">Acknowledgement</string>
-    <string name="content_boggle_acknowledge">        
-        Bloom Filter - \nhttp://obsearch.googlecode.com/svn-history/r642/trunk/src/main/
+    <string name="content_boggle_acknowledge">        Bloom Filter - \nhttp://obsearch.googlecode.com/svn-history/r642/trunk/src/main/
         java/net/obsearch/index/bucket/SimpleBloomFilter.java\n\n
         Background Music - \nhttp://www6.flash8.net/loop\n\n
         Sound Effect - \nhttp://www.obzx.yje.cn/Soft/spzy/201005/38.asp\n\n
@@ -68,5 +72,6 @@ row, each column, and each of the 3x3 boxes
          for 5 letter words. Three points for 6 letter
          words. Five points for 7 letter words. Eight
          points for words 8 character or longer.</string>
+    <string name="title_activity_persistent_boggle_login">PersistentBoggleLogin</string>
 
 </resources>

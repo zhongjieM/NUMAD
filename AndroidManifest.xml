@@ -91,6 +91,10 @@
             android:label="@string/title_activity_boggle_about"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.PersistentBoggleLogin"
+            android:label="@string/title_activity_persistent_boggle_login" >
+        </activity>
     </application>
 
 </manifest>

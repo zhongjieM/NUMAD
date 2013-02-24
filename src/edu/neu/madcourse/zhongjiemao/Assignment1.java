@@ -1,9 +1,12 @@
 package edu.neu.madcourse.zhongjiemao;
 
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+
 import edu.neu.madcourse.zhongjiemao.boggle.BoggleGame;
 import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
 import edu.neu.madcourse.zhongjiemao.sudoku.*;
 import edu.neu.mobileClass.PhoneCheckAPI;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -139,8 +142,9 @@ public class Assignment1 extends Activity implements OnClickListener{
 			startActivity(i);
 			break;
 		case R.id.btn_error:
-			int x = 10 / 0;
-			System.out.print(x);
+			i = new Intent(Intent.ACTION_DIAL, Uri.parse("tel: 12345"));
+			startActivity(i);
+			break;
 		case R.id.btn_boggle_game:
 			i = new Intent(this, BoggleMain.class);
 			startActivity(i);
