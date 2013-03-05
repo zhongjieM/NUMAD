@@ -1,4 +1,4 @@
-package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
+package edu.neu.madcourse.zhongjiemao.gsonhelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,6 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.mobileclass.apis.KeyValueAPI;
 
 /**

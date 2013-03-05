@@ -1,13 +1,9 @@
 package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 
-import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GsonHelper;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.mobileclass.apis.KeyValueAPI;
 
@@ -118,6 +114,11 @@ public class LoginBLL {
 	 * @return true if register success or false if not.
 	 */
 	private Boolean register(String uname, String pid) {
+
+		// TODO:
+		// Use GsonHelper to do the rest
+		// Delete the Gson object, password, teamname and userinfo of this
+		// class. No need to do them here.
 
 		Boolean check = false;
 		// Initially, the top score of a fresh user is 0.

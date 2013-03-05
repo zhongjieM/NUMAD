@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
-import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
 
 /**
  * This activity is the login activity of the persistent boggle game. The player
@@ -284,6 +283,8 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		private void loginSuccess() {
 			// create a new intent of Game Hall
 			Intent i = new Intent(getApplicationContext(), GameHall.class);
+			// TODO:
+			// Put the user ID into new Intent
 			startActivity(i);
 		}
 	}

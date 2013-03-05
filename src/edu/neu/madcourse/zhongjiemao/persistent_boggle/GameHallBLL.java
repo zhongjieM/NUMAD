@@ -1,6 +1,6 @@
 package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 
-import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GsonHelper;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
 
 /**
  * This class is to deal with the business logical layer of the GameHall
