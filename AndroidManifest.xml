@@ -6,10 +6,9 @@
 
     <!-- To allow to read the phone's information such as IMEI -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTING" />
-    
+
     <!--
      This part is required by the assignment 1 to 
 	 !	 ensure that my application will only run on 
@@ -98,6 +97,10 @@
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleLogin"
             android:label="@string/title_activity_persistent_boggle_login"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.GameHall"
+            android:label="@string/title_activity_game_hall" >
         </activity>
     </application>
 

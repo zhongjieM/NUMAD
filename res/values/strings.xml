@@ -73,5 +73,6 @@ row, each column, and each of the 3x3 boxes
          words. Five points for 7 letter words. Eight
          points for words 8 character or longer.</string>
     <string name="title_activity_persistent_boggle_login">PersistentBoggleLogin</string>
+    <string name="title_activity_game_hall">GameHall</string>
 
 </resources>

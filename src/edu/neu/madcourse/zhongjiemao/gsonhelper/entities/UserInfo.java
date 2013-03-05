@@ -16,8 +16,6 @@ package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
  */
 public class UserInfo {
 
-	// userID is a String, representing the user's id
-	private String userID;
 	// userName is a String, representing the user name
 	private String userName;
 	// phoneID is a String, representing the phone's id
@@ -39,22 +37,13 @@ public class UserInfo {
 	 * @param uphoneid
 	 * @param topScore
 	 */
-	public UserInfo(String uid, String uname, String uphoneid, int topScore) {
-		this.userID = uid;
+	public UserInfo(String uname, String uphoneid, int topScore) {
 		this.userName = uname;
 		this.phoneID = uphoneid;
 		this.topScore = topScore;
 	}
 
 	// getters and setter of all the members of this class
-
-	public String getUserID() {
-		return userID;
-	}
-
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
 
 	public String getUserName() {
 		return userName;
@@ -88,9 +77,9 @@ public class UserInfo {
 	 * Strategy: domain knowledge
 	 */
 	public String toString() {
-		return "User ID: " + this.userID + ", " + "User Name: " + this.userName
-				+ ", " + "Phone ID: " + this.phoneID + ", " + "Top Score: "
-				+ this.topScore + " |OVER|";
+		return "User Name: " + this.userName + ", " + "Phone ID: "
+				+ this.phoneID + ", " + "Top Score: " + this.topScore
+				+ " |OVER|";
 	}
 
 }

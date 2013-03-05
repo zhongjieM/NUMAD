@@ -3,11 +3,11 @@ package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GsonHelper;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.mobileclass.apis.KeyValueAPI;
 
@@ -26,6 +26,7 @@ public class LoginBLL {
 	private final String TEAMNAME = "ZJM";
 	private final String PASSWORD = "50019891";
 	private final String USERINFO = "USERINFO";
+	private GsonHelper gh;
 
 	/**
 	 * A login status is either:
@@ -44,7 +45,7 @@ public class LoginBLL {
 	public final static int UNACCESSIBLE = 3;
 
 	private Gson gson;
-	private Collection<UserInfo> userCollection;
+	private ArrayList<UserInfo> userCollection;
 
 	/**
 	 * Default Constructor Initialize Gson, userCollection.
@@ -53,9 +54,9 @@ public class LoginBLL {
 
 		// initialize Gson for future operation
 		gson = new Gson();
-
+		gh = new GsonHelper();
 		// initialize userCollection
-		this.userCollection = new ArrayList<UserInfo>();
+		userCollection = new ArrayList<UserInfo>();
 	}
 
 	/**
@@ -64,17 +65,8 @@ public class LoginBLL {
 	 * @return true if has contents or false if not.
 	 */
 	private boolean initializeUserInfoCollection() {
-		// Get the USERINFO table from remote server
-		String userInfoDataBase = KeyValueAPI.get(TEAMNAME, PASSWORD, USERINFO);
-		// if the USERINFO table are not empty, initialize that table
-		if (userInfoDataBase != "" && userInfoDataBase != null) {
-			JsonParser parser = new JsonParser();
-			JsonArray jarray = parser.parse(userInfoDataBase).getAsJsonArray();
-			UserInfo[] uis = new UserInfo[jarray.size()];
-			for (int i = 0; i < jarray.size(); i++) {
-				uis[i] = gson.fromJson(jarray.get(i), UserInfo.class);
-				this.userCollection.add(uis[i]);
-			}
+		userCollection = gh.getTableByTableNameFromServer(GsonHelper.USERINFO);
+		if (userCollection.size() != 0 && !userCollection.equals(null)) {
 			return true;
 		}
 		return false;
@@ -128,22 +120,12 @@ public class LoginBLL {
 	private Boolean register(String uname, String pid) {
 
 		Boolean check = false;
-		// if there is no record in USERINFO table, then the one create here is
-		// the first record of that table
-		int uid = 1;
 		// Initially, the top score of a fresh user is 0.
 		int topScore = 0;
 
 		// register operation ......
-		if (userCollection.size() != 0) {
-			// get a new user id
-			Object[] uis = userCollection.toArray();
-			uid = Integer.parseInt(((UserInfo) uis[userCollection.size() - 1])
-					.getUserID()) + 1;
-		}
 		// create a new user account
-		UserInfo newUser = new UserInfo(String.valueOf(uid), uname, pid,
-				topScore);
+		UserInfo newUser = new UserInfo(uname, pid, topScore);
 		// add this new account to the collection
 		userCollection.add(newUser);
 		// update this collection to the remote server

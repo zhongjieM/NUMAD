@@ -2,7 +2,7 @@ package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
 
 /**
  * An object of this class is an entity of a user who is online now. This class
- * contains the user's ID, user's status: already in a game or not, and the
+ * contains the user's name, user's status: already in a game or not, and the
  * inviter to this user.
  * 
  * When a user gets online, an object of this class will be generated as an
@@ -14,15 +14,16 @@ package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
  */
 public class OnLineUser {
 
-	// userID is a String, representing the user's ID who is just getting online
-	// this value is correspondent to the userID member of UserInfo class
-	private String userID;
+	// userName is a String, representing the user's user name who is just
+	// getting online this value is correspondent to the userID member of
+	// UserInfo class
+	private String userName;
 	// inGame is a Boolean, representing whether this online user is already in
 	// a room or not. If inGame is TRUE, then other players can't send him
 	// invitations any more.
 	private Boolean inGame;
-	// inviter is a String, representing the inviter player's userID which is
-	// corresponding to the userID member of UserInfo class.
+	// inviter is a String, representing the inviter player's user name which is
+	// corresponding to the user user name member of UserInfo class.
 	// If there are many other players send this player invitation, only the
 	// latest invitation will be shown to this user.
 	private String inviter;
@@ -41,19 +42,19 @@ public class OnLineUser {
 	 * @param intor
 	 */
 	public OnLineUser(String uid, Boolean ig, String intor) {
-		this.userID = uid;
+		this.userName = uid;
 		this.inGame = ig;
 		this.inviter = intor;
 	}
 
 	// getters and setters of all the members of this class
 
-	public String getUserID() {
-		return userID;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUserID(String userID) {
-		this.userID = userID;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public Boolean getInGame() {
@@ -79,7 +80,7 @@ public class OnLineUser {
 	 * Strategy: Domain Knowledge
 	 */
 	public String toString() {
-		return "Online Player: " + this.userID + ", " + "In Game?: "
+		return "Online Player: " + this.userName + ", " + "In Game?: "
 				+ this.inGame + "Latest Inviter: " + this.inviter + " |OVER|";
 	}
 }

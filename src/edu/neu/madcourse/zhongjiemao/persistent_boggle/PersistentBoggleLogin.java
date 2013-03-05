@@ -2,9 +2,9 @@ package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
+import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
 
 /**
  * This activity is the login activity of the persistent boggle game. The player
@@ -78,7 +79,7 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 * Get screen width and height values for arranging layout.
 	 */
 	private void initializeScreenParameter() {
-		// TODO Auto-generated method stub
+
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		// get screen width
@@ -91,17 +92,17 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 * Initialize the layout of this activity
 	 */
 	private void initializeComponent() {
-		// TODO Auto-generated method stub
+
 		layoutInflater = (LayoutInflater) this
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		View ly = layoutInflater.inflate(
 				R.layout.activity_persistent_boggle_login, null);
+
 		rly = (RelativeLayout) ly;
 		initializeTextViewUSR(rly);
 		initializeETUser(rly);
 		initializeBtnLogin(rly);
 		initializeBtnBack(rly);
-
 		initializeBtnOnClickEvents();
 
 		this.setContentView(rly);
@@ -113,7 +114,7 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 * @param rly
 	 */
 	private void initializeTextViewUSR(RelativeLayout rly) {
-		// TODO Auto-generated method stub
+
 		tv_usr = new TextView(this);
 		tv_usr.setText("User Name: ");
 		tv_usr.setTextSize(screenWidth / 35);
@@ -132,7 +133,6 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 * @param rly
 	 */
 	private void initializeETUser(RelativeLayout rly) {
-		// TODO Auto-generated method stub
 		et_username = new EditText(this);
 		et_username.setSingleLine();
 		et_username.setTextSize(this.screenWidth / 35);
@@ -194,7 +194,6 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
 		if (arg0.equals(btn_login)) {
 			// check whether the user name and password match.
 			Log.d(TAG, "Login Attempt");
@@ -239,7 +238,6 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 
 		@Override
 		protected Integer doInBackground(String... params) {
-			// TODO Auto-generated method stub
 			lbll = new LoginBLL();
 			try {
 				return lbll.isLoginApproved(params[0], params[1]);
@@ -285,6 +283,8 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		 */
 		private void loginSuccess() {
 			// create a new intent of Game Hall
+			Intent i = new Intent(getApplicationContext(), GameHall.class);
+			startActivity(i);
 		}
 	}
 }
