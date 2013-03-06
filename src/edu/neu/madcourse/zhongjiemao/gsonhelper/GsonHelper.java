@@ -345,7 +345,7 @@ public class GsonHelper {
 		RoomStatus rs;
 		while (it.hasNext()) {
 			rs = it.next();
-			if (rs.getRoomID() == roomID)
+			if (rs.getRoomID().intern() == roomID)
 				return rs;
 		}
 		return null;

@@ -14,12 +14,14 @@ import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.GameHallBLL;
 
 public class PersistentBoggleTest extends Activity implements OnClickListener {
 
 	private Button btn_InitializeRemoteServer;
 	private Button btn_GsonHelperTest;
 	private Button btn_ClearRecord;
+	private Button btn_GameHallBLLTest;
 
 	ArrayList<UserInfo> uial;
 	ArrayList<OnLineUser> oual;
@@ -51,6 +53,9 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 
 		btn_ClearRecord = (Button) findViewById(R.id.btn_ClearRemoteRecord);
 		btn_ClearRecord.setOnClickListener(this);
+
+		btn_GameHallBLLTest = (Button) findViewById(R.id.btn_GameHallBLLTest);
+		btn_GameHallBLLTest.setOnClickListener(this);
 	}
 
 	@Override
@@ -64,9 +69,11 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 			initializeRemoteServer();
 			break;
 		case R.id.btn_GsonHelperTest:
-			// TODO:
 			// Test GsonHelper class
-			TESTCASES();
+			BOTTOMTESTCASES();
+		case R.id.btn_GameHallBLLTest:
+			// TODO: Game Hall BLL Tests
+			GAMEHALLBLLTEST();
 			break;
 		}
 	}
@@ -86,7 +93,6 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 	}
 
 	private void initializeRemoteServer() {
-
 		if (clearRemoteServerData()) {
 			// Initialize All the tables with some dirty data
 			UserInfo ui1 = new UserInfo("kevin", "000000", 0);
@@ -98,7 +104,6 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 			uial = gsonHelper
 					.getTableByTableNameFromServer(GsonHelper.USERINFO);
 			System.out.println(uial.toString());
-			// TODO: initialize OnLineUser Table
 			OnLineUser olu1 = new OnLineUser("kevin", false,
 					OnLineUser.DEFAULT_INIVITER);
 			OnLineUser olu2 = new OnLineUser("robbins", false, "kevin");
@@ -110,11 +115,10 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 			oual = gsonHelper
 					.getTableByTableNameFromServer(GsonHelper.ONLINEUSER);
 			System.out.println(oual.toString());
-			// TODO: initialize RoomStatus Table
 		}
 	}
 
-	private void TESTCASES() {
+	private void BOTTOMTESTCASES() {
 
 		// Test Example 0: Empty table
 		System.out.println("Test Example 0: empty table");
@@ -197,6 +201,97 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 				GsonHelper.ONLINEUSER));
 		System.out.println("Test Example 5 Over");
 
+	}
+
+	private void GAMEHALLBLLTEST() {
+		// TODO: Game Hall BLL Tests
+		initializeRemoteServer();
+
+		// Game Hall BLL Test Example 1: loginInitialize()
+		System.out.println("Test Example 1: loginInitialize()");
+		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
+				"kevin", "kevin"));
+		gsonHelper.addNewGame("kevin", new RoomStatus("kevin", "kevin"));
+		gsonHelper.updateTable(GsonHelper.ONLINEUSER, new OnLineUser("kevin",
+				true, OnLineUser.DEFAULT_INIVITER));
+		System.out
+				.println("Show ROOMSTATUS table and Game before initializing");
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ROOMSTATUS));
+		System.out.println(gsonHelper.getGameByRoomID("kevin"));
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ONLINEUSER));
+		GameHallBLL ghb = new GameHallBLL("kevin");
+		ghb.loginInitialize();
+		System.out.println("Show ROOMSTATUS table and Game after initializing");
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ROOMSTATUS));
+		System.out.println(gsonHelper.getGameByRoomID("kevin"));
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ONLINEUSER));
+		System.out.println("Test Example 1 Over");
+
+		// Game Hall BLL Test Example 2: getRoomStatusAsAdapter()
+		initializeRemoteServer();
+		System.out.println("Test Example 2: getRoomStatusAsAdapter()");
+		gsonHelper.updateTable(GsonHelper.ONLINEUSER, new OnLineUser("kevin",
+				true, "robbins"));
+		System.out.println("initer is: " + ghb.checkInvitation());
+		System.out.println("Test Example 2 Over");
+
+		// Game Hall BLL Test Example 3: getRoomStatusAsAdapter()
+		initializeRemoteServer();
+		System.out.println("Test Example 3: getRoomStatusAsAdapter()");
+		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
+				"kvein", "kevin"));
+		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
+				"robbins", "robbins"));
+		System.out.println(ghb.getRoomStatusAsAdapter());
+		System.out.println("Test Example 3 Over");
+
+		// Game Hall BLL Test Example 4: quitGameHall();
+		initializeRemoteServer();
+		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
+				"kevin", "kevin"));
+		gsonHelper.addNewGame("kevin", new RoomStatus("kevin", "kevin"));
+		gsonHelper.updateTable(GsonHelper.ONLINEUSER, new OnLineUser("kevin",
+				true, OnLineUser.DEFAULT_INIVITER));
+		System.out.println("ONLINEUSER table before kevin quit");
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ONLINEUSER));
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ROOMSTATUS));
+		System.out.println(gsonHelper.getGameByRoomID("kevin"));
+		System.out.println("ONLINEUSER table after kevin quit");
+		ghb.quitGameHall();
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ONLINEUSER));
+		System.out.println(gsonHelper.getRecordFromTable("kevin",
+				GsonHelper.ROOMSTATUS));
+		System.out.println(gsonHelper.getGameByRoomID("kevin"));
+		System.out.println("Test Example 4 Over");
+
+		// Game Hall BLL Test Example 5: setIntoRoom("robbins");
+		initializeRemoteServer();
+		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
+				"robbins", 2, true, "robbins", "chen", "", "", ""));
+		System.out.println("Test Example 5: setIntoRoom(roomID)");
+		System.out.println("Before set into robbins");
+		System.out.println(gsonHelper.getRecordFromTable("robbins",
+				GsonHelper.ROOMSTATUS));
+		ghb.setIntoRoom("robbins");
+		System.out.println("After set into robbins");
+		System.out.println(gsonHelper.getRecordFromTable("robbins",
+				GsonHelper.ROOMSTATUS));
+		System.out.println("Test Example 5 Over");
+
+		// Game Hall BLL Test Example 6: startANewRoom()
+		initializeRemoteServer();
+		System.out.println("Test Example 6: startANewRoom()");
+		ghb.startANewRoom();
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ROOMSTATUS));
+		System.out.println("Test Example 6 Over");
 	}
 
 	private void toastResult(String result) {

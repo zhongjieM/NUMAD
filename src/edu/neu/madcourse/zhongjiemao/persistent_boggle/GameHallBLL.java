@@ -10,6 +10,8 @@ import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
  * This class is to deal with the business logical layer of the GameHall
  * Activity
  * 
+ * Currently Safe
+ * 
  * @author kevin
  * 
  */
@@ -48,6 +50,7 @@ public class GameHallBLL {
 		if (gsonHelper.isServerAvailable()) {
 			gsonHelper.deleteRecordFromTable(this.userName,
 					GsonHelper.ROOMSTATUS);
+			gsonHelper.deleteTable(this.userName);
 			gsonHelper.deleteRecordFromTable(this.userName,
 					GsonHelper.ONLINEUSER);
 			OnLineUser ou = new OnLineUser(this.userName, false,
@@ -71,7 +74,7 @@ public class GameHallBLL {
 		// delete it.
 		// 3. check if there is a room at ROOMINFO table, if there is one,
 		// delete it
-		gsonHelper.deleteRecordFromTable(this.userName, GsonHelper.ONLINEUSER);
+		gsonHelper.deleteRecordFromTable(this.userName, GsonHelper.ROOMSTATUS);
 		gsonHelper.deleteTable(this.userName);
 		check = gsonHelper.deleteRecordFromTable(this.userName,
 				GsonHelper.ONLINEUSER);
@@ -102,8 +105,10 @@ public class GameHallBLL {
 	 * This method is to get the Room Status information from remote server, and
 	 * then convert them into an adapter for the ListView of GameHall Activity
 	 * to use.
+	 * 
+	 * @return ArrayList<RoomStatus> if it is not empty
 	 */
-	public void getRoomStatusAsAdapter() {
+	public ArrayList<RoomStatus> getRoomStatusAsAdapter() {
 
 		// get the RoomStatus Table back from server
 		// convert them into adapter.
@@ -112,7 +117,9 @@ public class GameHallBLL {
 		if (!rsal.isEmpty()) {
 			// TODO: turn them into adapter in a form which can be accepted by
 			// ListView.
+			return rsal;
 		}
+		return null;
 	}
 
 	/**
@@ -143,9 +150,9 @@ public class GameHallBLL {
 		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
 				GsonHelper.ROOMSTATUS);
 		if (rs != null && !rs.getIsGameStarts()) {
-			if (rs.getPlayer2().intern() != "") {
+			if (rs.getPlayer2().intern() == "") {
 				rs.setPlayer2(this.userName);
-			} else if (rs.getPlayer3().intern() != "") {
+			} else if (rs.getPlayer3().intern() == "") {
 				rs.setPlayer3(this.userName);
 			} else {
 				return false;
