@@ -74,5 +74,6 @@ row, each column, and each of the 3x3 boxes
          points for words 8 character or longer.</string>
     <string name="title_activity_persistent_boggle_login">PersistentBoggleLogin</string>
     <string name="title_activity_game_hall">GameHall</string>
+    <string name="title_activity_persistent_boggle_test">PersistentBoggleTest</string>
 
 </resources>

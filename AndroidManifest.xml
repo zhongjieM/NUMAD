@@ -100,7 +100,13 @@
         </activity>
         <activity
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.GameHall"
-            android:label="@string/title_activity_game_hall" >
+            android:label="@string/title_activity_game_hall"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.test.PersistentBoggleTest"
+            android:label="@string/title_activity_persistent_boggle_test"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

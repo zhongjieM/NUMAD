@@ -15,8 +15,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
-import edu.neu.madcourse.zhongjiemao.R.raw;
-import edu.neu.madcourse.zhongjiemao.R.string;
 
 public class Game extends Activity {
    private static final String TAG = "Sudoku";

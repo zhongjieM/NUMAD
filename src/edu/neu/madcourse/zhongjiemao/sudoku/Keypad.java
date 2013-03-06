@@ -14,9 +14,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import edu.neu.madcourse.zhongjiemao.R;
-import edu.neu.madcourse.zhongjiemao.R.id;
-import edu.neu.madcourse.zhongjiemao.R.layout;
-import edu.neu.madcourse.zhongjiemao.R.string;
 
 public class Keypad extends Dialog {
 

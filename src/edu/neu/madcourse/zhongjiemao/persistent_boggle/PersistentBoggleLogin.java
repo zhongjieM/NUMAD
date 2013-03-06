@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.test.PersistentBoggleTest;
 
 /**
  * This activity is the login activity of the persistent boggle game. The player
@@ -44,6 +45,10 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	private Button btn_login;
 	// Button: quit the game
 	private Button btn_back;
+
+	// Button: show the test activity of persistent boggle.
+	private Button btn_test;
+
 	// EditText: to get the input of user name from the player
 	private EditText et_username;
 	// TextView: to show player the place to type his user name
@@ -102,6 +107,7 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		initializeETUser(rly);
 		initializeBtnLogin(rly);
 		initializeBtnBack(rly);
+		initializeBtnTest(rly);
 		initializeBtnOnClickEvents();
 
 		this.setContentView(rly);
@@ -183,12 +189,27 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		rly.addView(btn_back, btn_bakc_rllp);
 	}
 
+	private void initializeBtnTest(RelativeLayout rly) {
+		btn_test = new Button(this);
+		btn_test.setText("Test");
+		btn_test.setWidth(this.screenWidth * 2 / 5);
+		btn_test.setId(13);
+		RelativeLayout.LayoutParams btn_test_rllp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		btn_test_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		btn_test_rllp.addRule(RelativeLayout.BELOW, btn_back.getId());
+		btn_test_rllp.topMargin = this.screenHeight / 20;
+		rly.addView(btn_test, btn_test_rllp);
+	}
+
 	/**
 	 * Register all buttons to click listener
 	 */
 	private void initializeBtnOnClickEvents() {
 		btn_login.setOnClickListener(this);
 		btn_back.setOnClickListener(this);
+		btn_test.setOnClickListener(this);
 	}
 
 	@Override
@@ -201,6 +222,10 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		if (arg0.equals(btn_back)) {
 			Log.d(TAG, "Quit the game");
 			this.finish();
+		}
+		if (arg0.equals(btn_test)) {
+			Log.d(TAG, "Test the game");
+			startActivity(new Intent(this, PersistentBoggleTest.class));
 		}
 	}
 

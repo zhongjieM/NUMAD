@@ -14,6 +14,9 @@ package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
  */
 public class OnLineUser {
 
+	public final static String DEFAULT_INIVITER = "###";
+	public final static String LOCK_INIVATION = "@@@";
+
 	// userName is a String, representing the user's user name who is just
 	// getting online this value is correspondent to the userID member of
 	// UserInfo class
@@ -81,6 +84,7 @@ public class OnLineUser {
 	 */
 	public String toString() {
 		return "Online Player: " + this.userName + ", " + "In Game?: "
-				+ this.inGame + "Latest Inviter: " + this.inviter + " |OVER|";
+				+ this.inGame + ", " + "Latest Inviter: " + this.inviter
+				+ " |OVER|";
 	}
 }

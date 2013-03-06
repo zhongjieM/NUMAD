@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import edu.neu.madcourse.zhongjiemao.R;
-import edu.neu.madcourse.zhongjiemao.R.xml;
 
 public class Prefs extends PreferenceActivity {
    // Option names and default values
