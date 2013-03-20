@@ -1,4 +1,4 @@
-package edu.neu.madcourse.zhongjiemao.persistent_boggle;
+package edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL;
 
 import java.util.ArrayList;
 
@@ -36,32 +36,6 @@ public class GameHallBLL {
 	}
 
 	/**
-	 * This method is to initialize the user Online Information when the user
-	 * successfully login.
-	 */
-	public void loginInitialize() {
-		// update the Online Table
-		// clear all the dirty data of the current user.
-		// 1. check the Room Status if there is any Room that was under his
-		// name.
-		// 2. check the Room Info table to see if there is any game starts under
-		// his user name
-		// 3. Add a new record to ONLINE table
-		if (gsonHelper.isServerAvailable()) {
-			gsonHelper.deleteRecordFromTable(this.userName,
-					GsonHelper.ROOMSTATUS);
-			gsonHelper.deleteTable(this.userName);
-			gsonHelper.deleteRecordFromTable(this.userName,
-					GsonHelper.ONLINEUSER);
-			OnLineUser ou = new OnLineUser(this.userName, false,
-					OnLineUser.DEFAULT_INIVITER);
-			gsonHelper.addNewRecordToTable(GsonHelper.ONLINEUSER, ou);
-		}
-		// TODO: how to make sure that all the information have been set
-		// correctly at the server
-	}
-
-	/**
 	 * This method is to finish all the tasks left before quitting the game
 	 * hall. Delete its online record. Delete its room and game.
 	 * 
@@ -92,11 +66,15 @@ public class GameHallBLL {
 	public String checkInvitation() {
 		// Check the OnLine Table for his inviter fields
 		// if there is a new value, get it and then set it to be default value.
+		String invitation = "";
 		OnLineUser ou = (OnLineUser) gsonHelper.getRecordFromTable(
 				this.userName, GsonHelper.ONLINEUSER);
 		if (ou != null
 				&& ou.getInviter().intern() != OnLineUser.DEFAULT_INIVITER) {
-			return ou.getInviter();
+			invitation = ou.getInviter().intern();
+			ou.setInviter(OnLineUser.DEFAULT_INIVITER);
+			gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+			return invitation;
 		}
 		return null;
 	}
@@ -108,15 +86,13 @@ public class GameHallBLL {
 	 * 
 	 * @return ArrayList<RoomStatus> if it is not empty
 	 */
-	public ArrayList<RoomStatus> getRoomStatusAsAdapter() {
+	public ArrayList<RoomStatus> getRoomStatus() {
 
 		// get the RoomStatus Table back from server
 		// convert them into adapter.
 		ArrayList<RoomStatus> rsal = gsonHelper
 				.getTableByTableNameFromServer(GsonHelper.ROOMSTATUS);
-		if (!rsal.isEmpty()) {
-			// TODO: turn them into adapter in a form which can be accepted by
-			// ListView.
+		if (rsal != null) {
 			return rsal;
 		}
 		return null;
@@ -128,9 +104,33 @@ public class GameHallBLL {
 	 * @return true if create successfully, or false if not.
 	 */
 	public Boolean startANewRoom() {
-		Boolean check = false;
-		RoomStatus rs = new RoomStatus(this.userName, this.userName);
-		check = gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, rs);
+		Boolean check = true;
+		// firstly try to update InGame status to true;
+		OnLineUser ou = new OnLineUser(this.userName, true,
+				OnLineUser.DEFAULT_INIVITER);
+		check = gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+		// If update InGame status successfully, then add a new record to
+		// ROOMSTATUS table.
+		if (check) {
+			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(
+					userName, GsonHelper.ROOMSTATUS);
+			if (rs == null) {
+				rs = new RoomStatus(this.userName, this.userName);
+				check = gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS,
+						rs);
+			} else
+				// Already have a room for this player
+				return false;
+
+		}
+		// if all fail try to set status back
+		if (!check) {
+			ou = new OnLineUser(this.userName, false,
+					OnLineUser.DEFAULT_INIVITER);
+			gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+		}
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ROOMSTATUS));
 		return check;
 	}
 
@@ -150,9 +150,9 @@ public class GameHallBLL {
 		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
 				GsonHelper.ROOMSTATUS);
 		if (rs != null && !rs.getIsGameStarts()) {
-			if (rs.getPlayer2().intern() == "") {
+			if (rs.getPlayer2().intern() == RoomStatus.DEFAULT_PLAYER) {
 				rs.setPlayer2(this.userName);
-			} else if (rs.getPlayer3().intern() == "") {
+			} else if (rs.getPlayer3().intern() == RoomStatus.DEFAULT_PLAYER) {
 				rs.setPlayer3(this.userName);
 			} else {
 				return false;
@@ -164,7 +164,30 @@ public class GameHallBLL {
 			if (check) {
 				check = gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
 			}
+		} else {
+			// set back to online user table
+			gsonHelper.updateTable(GsonHelper.ONLINEUSER, new OnLineUser(
+					this.userName, false, OnLineUser.DEFAULT_INIVITER));
 		}
 		return check;
+	}
+
+	public RoomStatus getRoomInfo(String roomID) {
+		return (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+				GsonHelper.ROOMSTATUS);
+	}
+
+	/**
+	 * For test use
+	 */
+	public void ShowAllTables() {
+		System.out.println("Game Hall Table TESTs");
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.USERINFO));
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ONLINEUSER));
+		System.out.println(gsonHelper
+				.getTableByTableNameFromServer(GsonHelper.ROOMSTATUS));
+		System.out.println("END OF Game Hall Table TESTs");
 	}
 }

@@ -188,8 +188,6 @@ public class GsonHelper {
 		return false;
 	}
 
-	// TODO: update the table or game
-
 	/**
 	 * Update the record of a table by given table name.
 	 * 
@@ -231,7 +229,8 @@ public class GsonHelper {
 	/**
 	 * Get USERINFO table from the remote server
 	 * 
-	 * @return
+	 * @return if network not available, return null; otherwise, return an
+	 *         object of ArrayList<UserInfo>
 	 */
 	private ArrayList<UserInfo> getUserInfoFromServer() {
 		return getTableByTableTypeAndName(UserInfo.class, USERINFO);
@@ -240,7 +239,8 @@ public class GsonHelper {
 	/**
 	 * Get ONLINEUSER table from the remote server
 	 * 
-	 * @return
+	 * @return if network not available, return null; otherwise, return an
+	 *         object of ArrayList<OnLineUser>
 	 */
 	private ArrayList<OnLineUser> getOnLineUserFromServer() {
 		return getTableByTableTypeAndName(OnLineUser.class, ONLINEUSER);
@@ -249,7 +249,8 @@ public class GsonHelper {
 	/**
 	 * Get ROOMSTATUS table from remote server
 	 * 
-	 * @return
+	 * @return if network not available, return null; otherwise, return an
+	 *         object of ArrayList<RoomStatus>
 	 */
 	private ArrayList<RoomStatus> getRoomStatusFromServer() {
 		return getTableByTableTypeAndName(RoomStatus.class, ROOMSTATUS);
@@ -260,12 +261,16 @@ public class GsonHelper {
 	 * 
 	 * @param classType
 	 * @param tableName
-	 * @return
+	 * @return if network is not available, return null; otherwise,return an
+	 *         object of ArrayList<T>
 	 */
 	private <T> ArrayList<T> getTableByTableTypeAndName(Class<T> classType,
 			String tableName) {
 		ArrayList<T> tableArray = new ArrayList<T>();
 		JsonArray jarray = getJsonTableFromServerByKey(tableName);
+		// if network servrice not available, return null directly
+		if (jarray == null)
+			return null;
 		if (jarray.size() != 0) {
 			for (int i = 0; i < jarray.size(); i++)
 				tableArray.add(gson.fromJson(jarray.get(i), classType));
@@ -277,20 +282,24 @@ public class GsonHelper {
 	 * Get specific table from remote server by key value
 	 * 
 	 * @param key
-	 * @return
+	 * @return if network not available, return null; otherwise, return an
+	 *         object of JsonArray;
 	 */
 	private JsonArray getJsonTableFromServerByKey(String key) {
 		String jsonTable = "";
 		JsonParser parser;
-		if (KeyValueAPI.isServerAvailable()) {
+		Boolean check = KeyValueAPI.isServerAvailable();
+		if (check) {
 			parser = new JsonParser();
 			jsonTable = KeyValueAPI.get(TEAMNAME, PASSWORD, key);
 			if (jsonTable.intern() != "") {
 				// System.out.println(jsonTable);
 				return parser.parse(jsonTable).getAsJsonArray();
-			}
+			} else
+				return new JsonArray();
 		}
-		return new JsonArray();
+		// if network not available, return null directly
+		return null;
 	}
 
 	// ------------ Search a Specific Table for Specific Record----------------
@@ -305,11 +314,10 @@ public class GsonHelper {
 		ArrayList<UserInfo> uial = getUserInfoFromServer();
 		Iterator<UserInfo> it = uial.iterator();
 		UserInfo ui;
+		String targetUserName = userName.intern();
 		while (it.hasNext()) {
 			ui = it.next();
-			System.out.println(ui.toString());
-			System.out.println(userName + " : " + ui.getUserName());
-			if (ui.getUserName().intern() == userName)
+			if (ui.getUserName().intern() == targetUserName)
 				return ui;
 		}
 		return null;
@@ -325,9 +333,10 @@ public class GsonHelper {
 		ArrayList<OnLineUser> oual = getOnLineUserFromServer();
 		Iterator<OnLineUser> it = oual.iterator();
 		OnLineUser ou;
+		String targetUserName = userName.intern();
 		while (it.hasNext()) {
 			ou = it.next();
-			if (ou.getUserName().intern() == userName)
+			if (ou.getUserName().intern() == targetUserName)
 				return ou;
 		}
 		return null;
@@ -343,9 +352,10 @@ public class GsonHelper {
 		ArrayList<RoomStatus> rsal = getRoomStatusFromServer();
 		Iterator<RoomStatus> it = rsal.iterator();
 		RoomStatus rs;
+		String targetRoomID = roomID.intern();
 		while (it.hasNext()) {
 			rs = it.next();
-			if (rs.getRoomID().intern() == roomID)
+			if (rs.getRoomID().intern() == targetRoomID)
 				return rs;
 		}
 		return null;
@@ -437,20 +447,25 @@ public class GsonHelper {
 	 * @return
 	 */
 	private Boolean deleteRecordFromONLINEUSER(String userName) {
-		Boolean check = false;
+		Boolean check = true;
 		ArrayList<OnLineUser> oual = getOnLineUserFromServer();
+		if (oual == null)
+			return false;
 		OnLineUser ou;
 		Iterator<OnLineUser> iterator = oual.iterator();
 		int count = 0;
+		String targetUserName = userName.intern();
 		while (iterator.hasNext()) {
 			ou = iterator.next();
-			if (ou.getUserName().intern() == userName) {
+			if (ou.getUserName().intern() == targetUserName) {
 				oual.remove(count);
 				check = putTableBackToServer(oual, ONLINEUSER);
 				break;
 			}
 			count++;
 		}
+		// if find but fail to delete and put back, return false;
+		// if didn't find, return true;
 		return check;
 	}
 
@@ -461,20 +476,25 @@ public class GsonHelper {
 	 * @return
 	 */
 	private Boolean deleteRecordFromROOMSTATUS(String roomID) {
-		Boolean check = false;
+		Boolean check = true;
 		ArrayList<RoomStatus> rsal = getRoomStatusFromServer();
+		if (rsal == null)
+			return false;
 		RoomStatus rs;
 		Iterator<RoomStatus> iterator = rsal.iterator();
 		int count = 0;
+		String targetRoomID = roomID.intern();
 		while (iterator.hasNext()) {
 			rs = iterator.next();
-			if (rs.getRoomID().intern() == roomID) {
+			if (rs.getRoomID().intern() == targetRoomID) {
 				rsal.remove(count);
 				check = putTableBackToServer(rsal, ROOMSTATUS);
 				break;
 			}
 			count++;
 		}
+		// if find but fail to delete and put back, return false;
+		// if didn't find, return true;
 		return check;
 	}
 
@@ -490,18 +510,24 @@ public class GsonHelper {
 	private Boolean updateONLINEUSER(OnLineUser new_ou) {
 		Boolean check = false;
 		ArrayList<OnLineUser> oual = getOnLineUserFromServer();
+		// fail to get table back, return false directly.
+		if (oual == null)
+			return false;
 		Iterator<OnLineUser> iterator = oual.iterator();
 		OnLineUser ou;
 		int count = 0;
+		String userName = new_ou.getUserName().intern();
 		while (iterator.hasNext()) {
 			ou = iterator.next();
-			if (ou.getUserName().intern() == new_ou.getUserName().intern()) {
+			if (ou.getUserName().intern() == userName) {
 				oual.set(count, new_ou);
 				check = putTableBackToServer(oual, ONLINEUSER);
 				break;
 			}
 			count++;
 		}
+		// if find and updated, return true;
+		// if find but fail to updated, or didn't find, return false;
 		return check;
 	}
 
@@ -515,18 +541,23 @@ public class GsonHelper {
 	private Boolean updateROOMSTATUS(RoomStatus new_rs) {
 		Boolean check = false;
 		ArrayList<RoomStatus> rsal = getRoomStatusFromServer();
+		if (rsal == null)
+			return false;
 		Iterator<RoomStatus> iterator = rsal.iterator();
 		RoomStatus rs;
 		int count = 0;
+		String roomID = new_rs.getRoomID().intern();
 		while (iterator.hasNext()) {
 			rs = iterator.next();
-			if (rs.getRoomID().intern() == new_rs.getRoomID().intern()) {
+			if (rs.getRoomID().intern() == roomID) {
 				rsal.set(count, new_rs);
 				check = putTableBackToServer(rsal, ROOMSTATUS);
 				break;
 			}
 			count++;
 		}
+		// if find and updated, return true;
+		// if find but fail to updated, or didn't find, return false;
 		return check;
 	}
 }

@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.LoginBLL;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.test.PersistentBoggleTest;
 
 /**
@@ -234,18 +235,19 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 */
 	private void loginAttempt() {
 		String usr = et_username.getText().toString();
+		LoginAsyncTask login = new LoginAsyncTask();
 		if (usr.length() < 5) {
 			// here should send a toast to notify person that user name should
 			// not be less than 5 letters.
 			System.out.println("User Name Should be more than 5 letters");
+			login.showResult("User Name Should be more than 5 letters");
 			return;
 		}
 		// ...... Test Only
 		// Before commercial edition, uncomment the following code
 		// TelephonyManager tm = (TelephonyManager) this
 		// .getSystemService(Context.TELEPHONY_SERVICE);
-		String[] params = { usr, "0000000" };
-		LoginAsyncTask login = new LoginAsyncTask();
+		String[] params = { usr, "000000" };
 		login.execute(params);
 
 	}
@@ -260,11 +262,26 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 */
 	private class LoginAsyncTask extends AsyncTask<String, Void, Integer> {
 
+		private String userName;
+		private String phoneID;
+
 		@Override
 		protected Integer doInBackground(String... params) {
 			lbll = new LoginBLL();
+			Boolean check = false;
+			int login_result;
 			try {
-				return lbll.isLoginApproved(params[0], params[1]);
+				userName = params[0];
+				phoneID = params[1];
+				login_result = lbll.isLoginApproved(userName, phoneID);
+				if (login_result != LoginBLL.LOGIN_DENIED) {
+					check = lbll.loginInitialize(userName);
+					if (check) {
+						return login_result;
+					} else
+						return LoginBLL.UNACCESSIBLE;
+				}
+				return login_result;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -278,7 +295,6 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 			case LoginBLL.NO_SUCH_USER:
 			case LoginBLL.LOGIN_APPROVED:
 				loginSuccess();
-				showResult("Login Success");
 				break;
 			case LoginBLL.LOGIN_DENIED:
 				showResult("Sorry! Your username is not correct. Please try another one!");
@@ -308,8 +324,8 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		private void loginSuccess() {
 			// create a new intent of Game Hall
 			Intent i = new Intent(getApplicationContext(), GameHall.class);
-			// TODO:
 			// Put the user ID into new Intent
+			i.putExtra(GameHall.GAMEHALL_USERNAME, this.userName);
 			startActivity(i);
 		}
 	}

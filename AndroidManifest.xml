@@ -108,6 +108,15 @@
             android:label="@string/title_activity_persistent_boggle_test"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.Room"
+            android:label="@string/title_activity_room" >
+        </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.InvitationDialog"
+            android:label="@string/title_activity_invitation_dialog"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
     </application>
 
 </manifest>

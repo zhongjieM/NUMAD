@@ -145,12 +145,12 @@ public class BoggleGame extends Activity implements OnClickListener {
 			switch (isPause) {
 			case 1:
 				isPause = ON;
-				wordGridView.pause(this.ON);
+				wordGridView.pause(BoggleGame.ON);
 				btn_Pause.setText("Pause");
 				break;
 			case 2:
 				this.isPause = ON;
-				this.wordGridView.pause(this.ON);
+				this.wordGridView.pause(BoggleGame.ON);
 				this.stack_existed_words = new Stack<String>();
 				this.score = new Score(0);
 				this.recLen = GAMETIME;
@@ -158,7 +158,7 @@ public class BoggleGame extends Activity implements OnClickListener {
 				break;
 			case 0:
 				isPause = PAUSE;
-				wordGridView.pause(this.PAUSE);
+				wordGridView.pause(BoggleGame.PAUSE);
 				btn_Pause.setText("Resume");
 				break;
 			}
@@ -263,7 +263,7 @@ public class BoggleGame extends Activity implements OnClickListener {
 				System.out.println(ex.toString());
 			}
 		}
-		int status = this.getIntent().getIntExtra(this.GAMESTATUS, 2);
+		int status = this.getIntent().getIntExtra(BoggleGame.GAMESTATUS, 2);
 		if (status == 1) {
 			restoreData();
 			this.showCorrectWord();
@@ -272,7 +272,7 @@ public class BoggleGame extends Activity implements OnClickListener {
 		if (status == 2) {
 			startNewGame();
 		}
-		this.getIntent().putExtra(this.GAMESTATUS, 1);
+		this.getIntent().putExtra(BoggleGame.GAMESTATUS, 1);
 		Music.play(this, R.raw.bogglegaming);
 	}
 
@@ -288,13 +288,15 @@ public class BoggleGame extends Activity implements OnClickListener {
 		while (!this.stack_existed_words.isEmpty())
 			existed_word.append(this.stack_existed_words.pop() + "#");
 		getPreferences(MODE_PRIVATE).edit()
-				.putString(this.EXISTEDWORD, existed_word.toString()).commit();
-		getPreferences(MODE_PRIVATE).edit()
-				.putString(this.LETTERS, String.valueOf(this.letters)).commit();
-		getPreferences(MODE_PRIVATE).edit()
-				.putInt(this.SCORE, this.score.getScore()).commit();
-		getPreferences(MODE_PRIVATE).edit().putInt(this.TIMER, this.recLen)
+				.putString(BoggleGame.EXISTEDWORD, existed_word.toString())
 				.commit();
+		getPreferences(MODE_PRIVATE).edit()
+				.putString(BoggleGame.LETTERS, String.valueOf(this.letters))
+				.commit();
+		getPreferences(MODE_PRIVATE).edit()
+				.putInt(BoggleGame.SCORE, this.score.getScore()).commit();
+		getPreferences(MODE_PRIVATE).edit()
+				.putInt(BoggleGame.TIMER, this.recLen).commit();
 	}
 
 	/**
@@ -303,7 +305,7 @@ public class BoggleGame extends Activity implements OnClickListener {
 	private void restoreData() {
 		// reload existed words
 		String existed_word = getPreferences(MODE_PRIVATE).getString(
-				this.EXISTEDWORD, "");
+				BoggleGame.EXISTEDWORD, "");
 		String word = "";
 		stack_existed_words = new Stack<String>();
 		for (int i = 0; i < existed_word.length(); i++) {
@@ -314,13 +316,14 @@ public class BoggleGame extends Activity implements OnClickListener {
 				word += existed_word.charAt(i);
 		}
 		// reload score
-		int s = getPreferences(MODE_PRIVATE).getInt(this.SCORE, 0);
+		int s = getPreferences(MODE_PRIVATE).getInt(BoggleGame.SCORE, 0);
 		this.score = new Score(s);
 		// reload timer
-		recLen = getPreferences(MODE_PRIVATE).getInt(this.TIMER, GAMETIME);
+		recLen = getPreferences(MODE_PRIVATE)
+				.getInt(BoggleGame.TIMER, GAMETIME);
 		// reload letters
 		letters = new char[16];
-		String l = getPreferences(MODE_PRIVATE).getString(this.LETTERS,
+		String l = getPreferences(MODE_PRIVATE).getString(BoggleGame.LETTERS,
 				String.valueOf(bbll.generateWords(16)));
 		for (int i = 0; i < l.length(); i++) {
 			letters[i] = l.charAt(i);

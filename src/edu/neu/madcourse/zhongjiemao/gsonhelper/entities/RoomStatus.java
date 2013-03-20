@@ -21,6 +21,8 @@ package edu.neu.madcourse.zhongjiemao.gsonhelper.entities;
  */
 public class RoomStatus {
 
+	public final static String DEFAULT_PLAYER = "DEF";
+
 	// roomID is a String, representing the room's id, which is correspondent to
 	// the room ID in RoomInfo if the game of this room has begun
 	private String roomID;
@@ -86,6 +88,8 @@ public class RoomStatus {
 		this.numberOfPlayers = 1;
 		this.isGameStarts = false;
 		this.player1 = p1;
+		this.player2 = DEFAULT_PLAYER;
+		this.player3 = DEFAULT_PLAYER;
 	}
 
 	// getters and setters of all the members of this class

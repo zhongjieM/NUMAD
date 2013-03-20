@@ -75,5 +75,7 @@ row, each column, and each of the 3x3 boxes
     <string name="title_activity_persistent_boggle_login">PersistentBoggleLogin</string>
     <string name="title_activity_game_hall">GameHall</string>
     <string name="title_activity_persistent_boggle_test">PersistentBoggleTest</string>
+    <string name="title_activity_room">Room</string>
+    <string name="title_activity_invitation_dialog">InvitationDialog</string>
 
 </resources>

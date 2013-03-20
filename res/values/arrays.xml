@@ -14,4 +14,9 @@
       <item>@string/medium_label</item>
       <item>@string/hard_label</item>
    </array>
+   <array name="board">
+       <item>"4*4"</item>
+       <item>"5*5"</item>
+       <item>"6*6"</item>
+   </array>
 </resources>

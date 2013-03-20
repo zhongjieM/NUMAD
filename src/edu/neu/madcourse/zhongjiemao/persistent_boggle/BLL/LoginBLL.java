@@ -1,6 +1,7 @@
-package edu.neu.madcourse.zhongjiemao.persistent_boggle;
+package edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL;
 
 import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 
 /**
@@ -66,9 +67,35 @@ public class LoginBLL {
 		if (gh.isServerAvailable()) {
 			check = isThisPhoneHasGivenAccount(uname, pid);
 			if (check == NO_SUCH_USER)
-				if (!register(uname, pid))
+				if (!register(uname, pid)) {
 					check = UNACCESSIBLE;
+				}
 		}
+		return check;
+	}
+
+	/**
+	 * This method is to initialize the user Online Information when the user
+	 * successfully login.
+	 */
+	public Boolean loginInitialize(String userName) {
+		Boolean check = false;
+		// update the Online Table
+		// clear all the dirty data of the current user.
+		// 1. check the Room Status if there is any Room that was under his
+		// name.
+		// 2. check the Room Info table to see if there is any game starts under
+		// his user name
+		// 3. Add a new record to ONLINE table
+		check = gh.deleteRecordFromTable(userName, GsonHelper.ROOMSTATUS)
+				&& gh.deleteTable(userName)
+				&& gh.deleteRecordFromTable(userName, GsonHelper.ONLINEUSER);
+		OnLineUser ou = new OnLineUser(userName, false,
+				OnLineUser.DEFAULT_INIVITER);
+		check = check && gh.addNewRecordToTable(GsonHelper.ONLINEUSER, ou);
+		// TODO: how to make sure that all the information have been set
+		// correctly at the server
+		System.out.println("Login Initialize: " + check);
 		return check;
 	}
 
@@ -92,7 +119,7 @@ public class LoginBLL {
 				GsonHelper.USERINFO);
 		if (ui == null)
 			return NO_SUCH_USER;
-		else if (ui.getPhoneID() == pid)
+		else if (ui.getPhoneID().intern() == pid)
 			return LOGIN_APPROVED;
 		else
 			return LOGIN_DENIED;
