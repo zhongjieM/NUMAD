@@ -9,24 +9,26 @@
 -->
 <!-- This file is coppied from Sudoku Game. -->
 <resources>
-   <color name="background">#3500ffff</color>
-   <color name="puzzle_background">#ffe6f0ff</color>
-   <color name="puzzle_hilite">#ffffffff</color>
-   <color name="puzzle_light">#64c6d4ef</color>
-   <color name="puzzle_dark">#6456648f</color>
-   <color name="puzzle_foreground">#ff000000</color>
-   <color name="puzzle_hint_0">#64ff0000</color>
-   <color name="puzzle_hint_1">#6400ff80</color>
-   <color name="puzzle_hint_2">#2000ff80</color>
-   <color name="puzzle_selected">#641E90FF</color>
-   
-   <color name="boggle_background">#70ffffff</color>
-   <color name="boggle_selected">#90ffff00</color>
-   <color name="boggle_current_selected">#901E90FF</color>
-   <color name="boggle_timer">#ff00BFFF</color>
-   
-   <color name="boggle_word_color1">#ff00BB00</color>
-   <color name="boggle_word_color2">#ff00CD00</color>
-   <color name="boggle_word_color3">#ff00EE00</color>
-   <color name="boggle_word_color4">#ff00FF00</color>
+
+    <color name="background">#3500ffff</color>
+    <color name="puzzle_background">#ffe6f0ff</color>
+    <color name="puzzle_hilite">#ffffffff</color>
+    <color name="puzzle_light">#64c6d4ef</color>
+    <color name="puzzle_dark">#6456648f</color>
+    <color name="puzzle_foreground">#ff000000</color>
+    <color name="puzzle_hint_0">#64ff0000</color>
+    <color name="puzzle_hint_1">#6400ff80</color>
+    <color name="puzzle_hint_2">#2000ff80</color>
+    <color name="puzzle_selected">#641E90FF</color>
+    <color name="boggle_background">#70ffffff</color>
+    <color name="boggle_selected">#90ffff00</color>
+    <color name="boggle_current_selected">#901E90FF</color>
+    <color name="boggle_timer">#ff00BFFF</color>
+    <color name="boggle_word_color1">#ff00AA00</color>
+    <color name="boggle_word_color2">#ff00BB00</color>
+    <color name="boggle_word_color3">#ff00CC00</color>
+    <color name="boggle_word_color4">#ff00DD00</color>
+    <color name="boggle_word_color5">#ff00EE00</color>
+    <color name="boggle_word_color6">#ff00FF00</color>
+
 </resources>

@@ -217,7 +217,6 @@ public class Room extends Activity implements OnClickListener {
 		param.leftMargin = screenWidth / 7;
 		if (identity == Room.ID_ROOMPLAYER)
 			btn_Start.setEnabled(false);
-		System.out.println("Current Identity is: " + identity);
 		rl.addView(btn_Start, param);
 	}
 
@@ -231,6 +230,8 @@ public class Room extends Activity implements OnClickListener {
 		param.addRule(RelativeLayout.RIGHT_OF, btn_Start.getId());
 		param.topMargin = screenHeight / 10;
 		param.leftMargin = screenWidth / 10;
+		if (identity == Room.ID_ROOMPLAYER)
+			btn_Invite.setEnabled(false);
 		rl.addView(btn_Invite, param);
 	}
 
@@ -280,14 +281,13 @@ public class Room extends Activity implements OnClickListener {
 			break;
 		case RoomBLL.STATUS_GAME_START:
 			// TODO: start a new game
+			startGameAsMember();
 			break;
 		case RoomBLL.STATUS_YOU_ARE_MASTER:
 			// activate btn_Start
-			btn_Start.setVisibility(Button.VISIBLE);
 			break;
 		default:
 			// MEMBER, but IDENTITY NO CHANGE
-			btn_Start.setVisibility(Button.VISIBLE);
 			break;
 		}
 	}
@@ -353,14 +353,55 @@ public class Room extends Activity implements OnClickListener {
 		toast.show();
 	}
 
-	/** Ask the user what difficulty level they want */
+	/**
+	 * Ask the user what difficulty level they want
+	 * */
 	private void openNewGameDialog() {
 		new AlertDialog.Builder(this).setTitle("Start a New Game")
 				.setItems(R.array.board, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialoginterface, int i) {
-						System.out.println(String.valueOf(i));
+						if (roomBLL.createNewGame(i + 4, roomID)) {
+							startNewGame(i + 4, roomID, roomBLL.getLetters(),
+									PersistentBoggleGame.ROOMMASTER);
+						} else {
+							showToast("Sorry! You can't start right now!");
+						}
 					}
 				}).show();
+	}
+
+	/**
+	 * Start a new Game--persistent boggle game
+	 * 
+	 * @param mode
+	 * @param roomID
+	 */
+	private void startNewGame(int mode, String roomID, String letters,
+			int character) {
+		timer.cancel();
+		if (roomBLL.startGameOperation(userName)) {
+			Intent in = new Intent(getApplicationContext(),
+					PersistentBoggleGame.class);
+			in.putExtra(Room.INTENT_USERNAME, this.userName);
+			in.putExtra(PersistentBoggleGame.GAMEMODE, mode);
+			in.putExtra(INTENT_ROOMID, roomID);
+			in.putExtra(PersistentBoggleGame.LETTERS, letters);
+			in.putExtra(PersistentBoggleGame.CHARACTER, character);
+			startActivity(in);
+		} else {
+			showToast("Sorry! You can't start right now!");
+		}
+	}
+
+	private void startGameAsMember() {
+		if (!roomBLL.startable())
+			return;
+		String letters = roomBLL.getLettersFromServer(roomID);
+		while (letters == null) {
+			letters = roomBLL.getLettersFromServer(roomID);
+		}
+		startNewGame((int) Math.sqrt(letters.length()), roomID, letters,
+				PersistentBoggleGame.ROOMMEMBER);
 	}
 
 	private class QuitRoomAsyncTask extends AsyncTask<Void, Void, Boolean> {

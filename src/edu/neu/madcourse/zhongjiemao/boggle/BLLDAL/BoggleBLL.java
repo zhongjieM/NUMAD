@@ -19,6 +19,7 @@ public class BoggleBLL {
 
 	// Scoring System
 	private Score scoringSystem;
+	private int mode = 4;
 
 	/**
 	 * 
@@ -26,17 +27,12 @@ public class BoggleBLL {
 	 * dictionary to the Bloom Filter.
 	 */
 	public BoggleBLL(InputStream resource_is) {
-		try {
-			// initialize the scoring system
-			scoringSystem = new Score();
+		initialize(resource_is);
+	}
 
-			// initialize the bloom filter
-			sbf_dictionary = new SimpleBloomFilter<String>(12000000, 440000);
-			// import the bit files of the dictionary to bloom filter
-			sbf_dictionary.readBit(resource_is);
-		} catch (Exception ex) {
-			System.out.println(ex.toString());
-		}
+	public BoggleBLL(InputStream resource_is, int mode) {
+		this.mode = mode;
+		initialize(resource_is);
 	}
 
 	/**
@@ -76,15 +72,29 @@ public class BoggleBLL {
 			int num = (Math.abs(new Random().nextInt())) % 26;
 			words[i] = (char) (num + 97);
 		}
-		for (int i = 0; i < 4; i++) {
-			int index = (Math.abs((new Random()).nextInt())) % 4;
+		for (int i = 0; i < mode; i++) {
+			int index = (Math.abs((new Random()).nextInt())) % mode;
 			int num = (Math.abs(new Random().nextInt())) % 5;
-			words[i * 4 + index] = (char) vowels[num];
+			words[i * mode + index] = (char) vowels[num];
 		}
 		return words;
 	}
 
 	public boolean isEmpty() {
 		return sbf_dictionary.isEmpty();
+	}
+
+	private void initialize(InputStream resource_is) {
+		try {
+			// initialize the scoring system
+			scoringSystem = new Score();
+
+			// initialize the bloom filter
+			sbf_dictionary = new SimpleBloomFilter<String>(12000000, 440000);
+			// import the bit files of the dictionary to bloom filter
+			sbf_dictionary.readBit(resource_is);
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
 	}
 }

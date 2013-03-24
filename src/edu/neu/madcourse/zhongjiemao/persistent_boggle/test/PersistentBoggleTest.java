@@ -3,6 +3,9 @@ package edu.neu.madcourse.zhongjiemao.persistent_boggle.test;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -13,8 +16,10 @@ import edu.neu.madcourse.zhongjiemao.R;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.GameHallBLL;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGameHall;
 
 public class PersistentBoggleTest extends Activity implements OnClickListener {
 
@@ -22,6 +27,11 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 	private Button btn_GsonHelperTest;
 	private Button btn_ClearRecord;
 	private Button btn_GameHallBLLTest;
+
+	private NotificationManager notificationManager;
+	private Button btn_NotificationTest;
+	private Button btn_NotificationTestCancel;
+	private ServiceForGameHall sfg;
 
 	ArrayList<UserInfo> uial;
 	ArrayList<OnLineUser> oual;
@@ -56,6 +66,12 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 
 		btn_GameHallBLLTest = (Button) findViewById(R.id.btn_GameHallBLLTest);
 		btn_GameHallBLLTest.setOnClickListener(this);
+
+		btn_NotificationTest = (Button) findViewById(R.id.btn_NotificationTest);
+		btn_NotificationTest.setOnClickListener(this);
+
+		btn_NotificationTestCancel = (Button) findViewById(R.id.btn_NotificationTestCancel);
+		btn_NotificationTestCancel.setOnClickListener(this);
 	}
 
 	@Override
@@ -71,9 +87,16 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 		case R.id.btn_GsonHelperTest:
 			// Test GsonHelper class
 			BOTTOMTESTCASES();
+			break;
 		case R.id.btn_GameHallBLLTest:
 			// TODO: Game Hall BLL Tests
-			GAMEHALLBLLTEST();
+			USERGAMESTATUSTEST();
+			break;
+		case R.id.btn_NotificationTest:
+			NOTIFICATIONTEST();
+			break;
+		case R.id.btn_NotificationTestCancel:
+			NOTIFICATIONTESTCANCEL();
 			break;
 		}
 	}
@@ -147,9 +170,6 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 		} else {
 			System.out.println("Kevin exists: " + ui.toString());
 		}
-		RoomStatus rs = gsonHelper.getGameByRoomID("kevin");
-		if (rs == null)
-			System.out.println("kevin room not exists");
 		System.out.println("Test Example 1 Over");
 
 		// Test Example 2: delete a record from ONLINEUSER table
@@ -181,20 +201,6 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 		System.out.println(gsonHelper
 				.getTableByTableNameFromServer(GsonHelper.ROOMSTATUS));
 		System.out.println("Test Example 3 Over");
-
-		// Test Example 4: delete a game
-		System.out.println("Test Example 4: test delete a game");
-		System.out.println("Add a new game at server");
-		RoomStatus test4_rs = new RoomStatus("kevin", 3, true, "kevin",
-				"robbins", "chen", "kevin", "");
-		gsonHelper.addNewGame("kevin", test4_rs);
-		System.out.println("Show the added game");
-		System.out.println(gsonHelper.getGameByRoomID("kevin"));
-		System.out.println("Delete this game");
-		System.out.println("Delete result: " + gsonHelper.deleteTable("kevin"));
-		System.out.println("Show the deletion result");
-		System.out.println(gsonHelper.getGameByRoomID("kevin"));
-		System.out.println("Test Example 4 Over");
 
 		// Test Example 5: update a record in ONLINEUSER table
 		System.out
@@ -256,28 +262,6 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 		System.out.println(ghb.getRoomStatus());
 		System.out.println("Test Example 3 Over");
 
-		// Game Hall BLL Test Example 4: quitGameHall();
-		initializeRemoteServer();
-		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
-				"kevin", "kevin"));
-		gsonHelper.addNewGame("kevin", new RoomStatus("kevin", "kevin"));
-		gsonHelper.updateTable(GsonHelper.ONLINEUSER, new OnLineUser("kevin",
-				true, OnLineUser.DEFAULT_INIVITER));
-		System.out.println("ONLINEUSER table before kevin quit");
-		System.out.println(gsonHelper
-				.getTableByTableNameFromServer(GsonHelper.ONLINEUSER));
-		System.out.println(gsonHelper.getRecordFromTable("kevin",
-				GsonHelper.ROOMSTATUS));
-		System.out.println(gsonHelper.getGameByRoomID("kevin"));
-		System.out.println("ONLINEUSER table after kevin quit");
-		ghb.quitGameHall();
-		System.out.println(gsonHelper
-				.getTableByTableNameFromServer(GsonHelper.ONLINEUSER));
-		System.out.println(gsonHelper.getRecordFromTable("kevin",
-				GsonHelper.ROOMSTATUS));
-		System.out.println(gsonHelper.getGameByRoomID("kevin"));
-		System.out.println("Test Example 4 Over");
-
 		// Game Hall BLL Test Example 5: setIntoRoom("robbins");
 		initializeRemoteServer();
 		gsonHelper.addNewRecordToTable(GsonHelper.ROOMSTATUS, new RoomStatus(
@@ -302,8 +286,45 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 		System.out.println("Test Example 6 Over");
 	}
 
+	private void USERGAMESTATUSTEST() {
+		// Test 1: create a record
+		UserGameStatus ugs_test1 = new UserGameStatus("Cleng");
+		gsonHelper.initializeUserGameStatus("Cleng", false);
+		UserGameStatus ugs_test1_expect = gsonHelper.getUserGameStatus("Cleng");
+		if (ugs_test1.toString().intern() == ugs_test1_expect.toString()
+				.intern())
+			System.out.println("Test1 approved");
+		else
+			System.out.println("Test1 failed");
+
+		// Test 2: update a record
+		UserGameStatus ugs_test2 = gsonHelper.getUserGameStatus("Cleng");
+		ugs_test2.setInGame(true);
+		gsonHelper.updateUserGameStatus("Cleng", ugs_test2);
+		ugs_test2 = gsonHelper.getUserGameStatus("Cleng");
+		UserGameStatus ugs_test2_expect = new UserGameStatus("Cleng");
+		ugs_test2_expect.setInGame(true);
+		if (ugs_test2_expect.toString().intern() == ugs_test2.toString()
+				.intern()) {
+			System.out.println("Test2 approved");
+		} else
+			System.out.println("Test2 failed");
+
+	}
+
 	private void toastResult(String result) {
 		Toast toast = Toast.makeText(this, result, Toast.LENGTH_SHORT);
 		toast.show();
+	}
+
+	private void NOTIFICATIONTEST() {
+		System.out.println("Pressed");
+		Intent i = new Intent(this, ServiceForGameHall.class);
+		getApplicationContext().startService(i);
+	}
+
+	private void NOTIFICATIONTESTCANCEL() {
+		getApplicationContext().stopService(
+				new Intent(this, ServiceForGameHall.class));
 	}
 }

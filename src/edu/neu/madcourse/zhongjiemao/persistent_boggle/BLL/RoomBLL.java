@@ -1,10 +1,13 @@
 package edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleGame;
 
 /**
  * This class is to deal with the room BLL. All the public methods will be used
@@ -24,11 +27,16 @@ public class RoomBLL {
 	private String roomID;
 	private String userName;
 	private GsonHelper gsonHelper;
+	private String letters;
 
 	public RoomBLL(String roomID, String userName) {
 		this.roomID = roomID;
 		this.userName = userName;
 		gsonHelper = new GsonHelper();
+	}
+
+	public String getLetters() {
+		return letters;
 	}
 
 	/**
@@ -83,6 +91,8 @@ public class RoomBLL {
 	public RoomStatus getRoomStatus() {
 		this.roomStatus = (RoomStatus) gsonHelper.getRecordFromTable(
 				this.roomID, GsonHelper.ROOMSTATUS);
+		if (roomStatus != null)
+			updateUserGameStatus(this.roomStatus.getIsGameStarts());
 		return this.roomStatus;
 	}
 
@@ -151,6 +161,113 @@ public class RoomBLL {
 			ou.setInviter(OnLineUser.DEFAULT_INIVITER);
 			return gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
 		}
+		return false;
+	}
+
+	/**
+	 * Create a new room and initialize the letters according to the game mode
+	 * and roomID.
+	 * 
+	 * @param mode
+	 * @param roomID
+	 * @return true if created successfully or false if not.
+	 */
+	public Boolean createNewGame(int mode, String roomID) {
+		// Check other players status
+		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(userName,
+				GsonHelper.ROOMSTATUS);
+		if (rs != null) {
+			String player2 = rs.getPlayer2();
+			String player3 = rs.getPlayer3();
+			UserGameStatus ugs2 = new UserGameStatus();
+			UserGameStatus ugs3 = new UserGameStatus();
+			if (player2.intern() != RoomStatus.DEFAULT_PLAYER)
+				ugs2 = gsonHelper.getUserGameStatus(player2);
+			if (player3.intern() != RoomStatus.DEFAULT_PLAYER)
+				ugs3 = gsonHelper.getUserGameStatus(player3);
+			if (ugs2 == null || ugs3 == null) {
+				System.out.println("ugs2 or ugs3 is null");
+			}
+			System.out.println(ugs2.getInGame() + " : " + ugs3.getInGame());
+			if ((!ugs2.getInGame()) && (!ugs3.getInGame())) {
+				letters = String.valueOf(generateWords(mode));
+				rs.setCurrentString(letters);
+				rs.setIsGameStarts(true);
+				return gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Initialize user's game status record
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public Boolean startGameOperation(String userName) {
+		return gsonHelper.initializeUserGameStatus(userName, true);
+	}
+
+	/**
+	 * To Generate n ramdom letters
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public char[] generateWords(int n) {
+		char[] words = new char[n * n];
+		char[] vowels = { 'a', 'e', 'i', 'o', 'u' };
+		for (int i = 0; i < n * n; i++) {
+			int num = (Math.abs(new Random().nextInt())) % 26;
+			words[i] = (char) (num + 97);
+		}
+		for (int i = 0; i < n; i++) {
+			int index = (Math.abs((new Random()).nextInt())) % n;
+			int num = (Math.abs(new Random().nextInt())) % 5;
+			words[i * n + index] = (char) vowels[num];
+		}
+		return words;
+	}
+
+	/**
+	 * Find that game is start and will try to get letters from remote server
+	 * 
+	 * @param roomID
+	 * @return the letters if found successfully, or null if can't
+	 */
+	public String getLettersFromServer(String roomID) {
+		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+				GsonHelper.ROOMSTATUS);
+		if (rs == null) {
+			return String.valueOf(generateWords(4));
+		}
+		return rs.getCurrentString();
+	}
+
+	private Boolean updateUserGameStatus(Boolean roomStatus) {
+		UserGameStatus ugs = gsonHelper.getUserGameStatus(userName);
+		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+				GsonHelper.ROOMSTATUS);
+		if (ugs != null) {
+			System.out.println("Trying to update user status: "
+					+ ugs.toString());
+			System.out.println("Check room Status: " + rs.getIsGameStarts());
+			if (ugs.getInGame() == true && rs.getIsGameStarts() == false) {
+				ugs.setInGame(false);
+				gsonHelper.updateUserGameStatus(userName, ugs);
+				System.out.println("Check user status *******: "
+						+ gsonHelper.getUserGameStatus(userName).getInGame());
+				return true;
+			}
+		}
+		return true;
+	}
+
+	public Boolean startable() {
+		// TODO Auto-generated method stub
+		if (gsonHelper.getUserGameStatus(userName).getInGame() == false)
+			return true;
 		return false;
 	}
 }

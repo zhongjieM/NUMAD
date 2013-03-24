@@ -93,9 +93,7 @@ public class LoginBLL {
 		OnLineUser ou = new OnLineUser(userName, false,
 				OnLineUser.DEFAULT_INIVITER);
 		check = check && gh.addNewRecordToTable(GsonHelper.ONLINEUSER, ou);
-		// TODO: how to make sure that all the information have been set
-		// correctly at the server
-		System.out.println("Login Initialize: " + check);
+		gh.initializeUserGameStatus(userName, false);
 		return check;
 	}
 

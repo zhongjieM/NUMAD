@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.mobileclass.apis.KeyValueAPI;
 
@@ -70,23 +71,29 @@ public class GsonHelper {
 			return null;
 	}
 
-	/**
-	 * Given a room id, check if the game in this room has started
-	 * 
-	 * @param roomID
-	 * @return if started, return an object of RoomStatus of this room. or null,
-	 *         if the game has not yet started.
-	 */
-	public RoomStatus getGameByRoomID(String roomID) {
-		if (KeyValueAPI.isServerAvailable()) {
-			String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID)
-					.intern();
-			if (jString != "") {
-				return gson.fromJson(jString, RoomStatus.class);
-			}
-		}
-		return null;
-	}
+	// /**
+	// * Given a room id, check if the game in this room has started
+	// *
+	// * @param roomID
+	// * @return if started, return an object of RoomStatus of this room. or
+	// null,
+	// * if the game has not yet started.
+	// */
+	// public RoomStatus getGameByRoomID(String roomID) {
+	// try {
+	// if (KeyValueAPI.isServerAvailable()) {
+	// String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID)
+	// .intern();
+	// if (jString != "") {
+	// System.out.println("Test GsonHelper: " + jString);
+	// return gson.fromJson(jString, RoomStatus.class);
+	// }
+	// }
+	// return null;
+	// } catch (Exception ex) {
+	// return null;
+	// }
+	// }
 
 	/**
 	 * Given the primary key of a table, check if it has a matched record in the
@@ -126,23 +133,27 @@ public class GsonHelper {
 		}
 	}
 
-	/**
-	 * Register a new Game to server according to roomID
-	 * 
-	 * @param roomID
-	 * @param rs
-	 * @return true if register successfully or false if not.
-	 */
-	public Boolean addNewGame(String roomID, RoomStatus rs) {
-		if (KeyValueAPI.isServerAvailable()) {
-			if (getGameByRoomID(roomID) == null) {
-				String jString = gson.toJson(rs);
-				KeyValueAPI.put(TEAMNAME, PASSWORD, roomID, jString);
-				return true;
-			}
-		}
-		return false;
-	}
+	// /**
+	// * Register a new Game to server according to roomID
+	// *
+	// * @param roomID
+	// * @param rs
+	// * @return true if register successfully or false if not.
+	// */
+	// public Boolean addNewGame(String roomID, RoomStatus rs) {
+	// try {
+	// if (KeyValueAPI.isServerAvailable()) {
+	// if (getGameByRoomID(roomID) == null) {
+	// String jString = gson.toJson(rs);
+	// KeyValueAPI.put(TEAMNAME, PASSWORD, roomID, jString);
+	// return true;
+	// }
+	// }
+	// return false;
+	// } catch (Exception ex) {
+	// return false;
+	// }
+	// }
 
 	/**
 	 * Clear all the tables. This is just for test use.
@@ -181,11 +192,16 @@ public class GsonHelper {
 	 * @return
 	 */
 	public Boolean deleteTable(String tableName) {
-		if (KeyValueAPI.isServerAvailable()) {
-			if (KeyValueAPI.clearKey(TEAMNAME, PASSWORD, tableName).intern() == "true")
-				return true;
+		try {
+			if (KeyValueAPI.isServerAvailable()) {
+				if (KeyValueAPI.clearKey(TEAMNAME, PASSWORD, tableName)
+						.intern() == "true")
+					return true;
+			}
+			return false;
+		} catch (Exception ex) {
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -205,23 +221,67 @@ public class GsonHelper {
 		}
 	}
 
-	/**
-	 * Update a game's status. This game has been started
-	 * 
-	 * @param roomID
-	 * @param new_game_status
-	 * @return
-	 */
-	public Boolean updateGame(String roomID, RoomStatus new_game_status) {
-		if (KeyValueAPI.isServerAvailable()) {
-			String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID);
-			if (jString.intern() != "") {
-				jString = gson.toJson(new_game_status);
+	// /**
+	// * Update a game's status. This game has been started
+	// *
+	// * @param roomID
+	// * @param new_game_status
+	// * @return
+	// */
+	// public Boolean updateGame(String roomID, RoomStatus new_game_status) {
+	// try {
+	// if (KeyValueAPI.isServerAvailable()) {
+	// String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID);
+	// if (jString.intern() != "") {
+	// jString = gson.toJson(new_game_status);
+	// return Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
+	// roomID, jString));
+	// }
+	// }
+	// return false;
+	// } catch (Exception ex) {
+	// return false;
+	// }
+	// }
+
+	public Boolean initializeUserGameStatus(String userName, Boolean inGame) {
+		UserGameStatus ugs = new UserGameStatus(userName);
+		ugs.setInGame(inGame);
+		try {
+			if (KeyValueAPI.isServerAvailable())
 				return Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
-						roomID, jString));
-			}
+						userName, gson.toJson(ugs)));
+			return false;
+		} catch (Exception ex) {
+			return false;
 		}
-		return false;
+	}
+
+	public UserGameStatus getUserGameStatus(String userName) {
+		try {
+			if (KeyValueAPI.isServerAvailable()) {
+				String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, userName)
+						.intern();
+				if (jString != "")
+					return gson.fromJson(jString, UserGameStatus.class);
+			}
+			return null;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
+	public Boolean updateUserGameStatus(String userName,
+			UserGameStatus new_status) {
+		try {
+			if (KeyValueAPI.isServerAvailable()) {
+				return Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
+						userName, gson.toJson(new_status)));
+			}
+			return false;
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 
 	// ------------------------ Get table information from server -------------
@@ -288,18 +348,22 @@ public class GsonHelper {
 	private JsonArray getJsonTableFromServerByKey(String key) {
 		String jsonTable = "";
 		JsonParser parser;
-		Boolean check = KeyValueAPI.isServerAvailable();
-		if (check) {
-			parser = new JsonParser();
-			jsonTable = KeyValueAPI.get(TEAMNAME, PASSWORD, key);
-			if (jsonTable.intern() != "") {
-				// System.out.println(jsonTable);
-				return parser.parse(jsonTable).getAsJsonArray();
-			} else
-				return new JsonArray();
+		try {
+			Boolean check = KeyValueAPI.isServerAvailable();
+			if (check) {
+				parser = new JsonParser();
+				jsonTable = KeyValueAPI.get(TEAMNAME, PASSWORD, key);
+				if (jsonTable.intern() != "") {
+					// System.out.println(jsonTable);
+					return parser.parse(jsonTable).getAsJsonArray();
+				} else
+					return new JsonArray();
+			}
+			// if network not available, return null directly
+			return null;
+		} catch (Exception ex) {
+			return null;
 		}
-		// if network not available, return null directly
-		return null;
 	}
 
 	// ------------ Search a Specific Table for Specific Record----------------
@@ -331,6 +395,8 @@ public class GsonHelper {
 	 */
 	private OnLineUser getRecordFromONLINEUSER(String userName) {
 		ArrayList<OnLineUser> oual = getOnLineUserFromServer();
+		if (oual == null)
+			return null;
 		Iterator<OnLineUser> it = oual.iterator();
 		OnLineUser ou;
 		String targetUserName = userName.intern();
@@ -350,6 +416,8 @@ public class GsonHelper {
 	 */
 	private RoomStatus getRecordFromROOMSTATUS(String roomID) {
 		ArrayList<RoomStatus> rsal = getRoomStatusFromServer();
+		if (rsal == null)
+			return null;
 		Iterator<RoomStatus> it = rsal.iterator();
 		RoomStatus rs;
 		String targetRoomID = roomID.intern();
@@ -429,13 +497,17 @@ public class GsonHelper {
 	 */
 	private <T> Boolean putTableBackToServer(ArrayList<T> table,
 			String tableName) {
-		Boolean check = KeyValueAPI.isServerAvailable();
-		// check network available before put table back to server
-		if (check) {
-			check = Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
-					tableName, gson.toJson(table)));
+		try {
+			Boolean check = KeyValueAPI.isServerAvailable();
+			// check network available before put table back to server
+			if (check) {
+				check = Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
+						tableName, gson.toJson(table)));
+			}
+			return check;
+		} catch (Exception ex) {
+			return false;
 		}
-		return check;
 	}
 
 	// ----------------------- Delete Record From Table -----------------------
@@ -556,8 +628,6 @@ public class GsonHelper {
 			}
 			count++;
 		}
-		// if find and updated, return true;
-		// if find but fail to updated, or didn't find, return false;
 		return check;
 	}
 }
