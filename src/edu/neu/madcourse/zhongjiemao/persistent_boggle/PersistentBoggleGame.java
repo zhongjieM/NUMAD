@@ -27,6 +27,7 @@ import android.widget.TextView;
 import edu.neu.madcourse.zhongjiemao.R;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.Score;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.SoundEffect;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GameOverResult;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.PersistentBoggleBLL;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
@@ -68,6 +69,7 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 
 	// Network tasks message id;
 	private static final int NETWORK_TASKS_UPDATE_PLAYER_INFO = 1;
+	private static final int NETWORK_TASKS_GAME_OVER = 2;
 
 	// store the screen size
 	private int screen_width = 0;
@@ -133,6 +135,7 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	private Timer networkTasksTimer;
 	private static Handler networkTasksHandler;
 	private TimerTask timertask_NetworkTasks_UpdatePlayers;
+	private GameOverResult gor;
 
 	// Service part
 	private ServiceController serviceController;
@@ -178,11 +181,13 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 				serviceController
 						.stopServiceById(ServiceController.SERVICE_FOR_GAME);
 				recLen = getSharedPreferences("GAME_TIME_CURRENT", MODE_PRIVATE)
-						.getInt("TIME_CURRENT", 180);
+						.getInt("TIME_CURRENT", GAMETIME);
 			}
 			initializeNetworkListener();
 			timer();
 		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggle: onResume Failed";
+			System.out.println(errorMessage);
 			System.out.println(ex.toString());
 		}
 		Music.play(this, R.raw.bogglegaming);
@@ -193,19 +198,21 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	// automatically called when the activity paused
 	protected void onPause() {
 		Log.d(TAG, "onPause");
-		timer.cancel();
-		if (!isBackExitPressed) {
-			saveData();
-			// TODO: HOME button or Power button clicked,
-			// Start a service to continue the job.
-			serviceController = new ServiceController(this);
-			String[] params = { roomID, userName, String.valueOf(character),
-					String.valueOf(recLen) };
-			serviceController.startServiceForGame(params);
-		} else {
-			System.out.println("Back or Exit Button pressed");
-
-			isBackExitPressed = false;
+		try {
+			stopTimerTasks();
+			if (!isBackExitPressed) {
+				// Start a service to continue the job.
+				serviceController = new ServiceController(this);
+				String[] params = { roomID, userName,
+						String.valueOf(character), String.valueOf(recLen) };
+				serviceController.startServiceForGame(params);
+			} else {
+				isBackExitPressed = false;
+			}
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggle: onPause Failed";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
 		}
 		Music.stop(this);
 		super.onPause();
@@ -284,16 +291,17 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		roomID = this.getIntent().getStringExtra(Room.INTENT_ROOMID);
 		if (bbll == null || bbll.isEmpty()) {
 			bbll = new PersistentBoggleBLL(mode, roomID);
-			LoacDictionary ld = new LoacDictionary();
-			ld.execute();
+			try {
+				LoacDictionary ld = new LoacDictionary();
+				ld.execute();
+			} catch (Exception ex) {
+				String errorMessage = "Failed to load dictionary!";
+				System.out.println(errorMessage);
+			}
 		}
-
 		int status = this.getIntent().getIntExtra(
 				PersistentBoggleGame.GAMESTATUS, 2);
 		if (status == 1) {
-			// TODO:
-			// Continue a previous game
-			// but NO need to do this in persistent boggle
 			restoreData();
 			this.showCorrectWord();
 		}
@@ -389,24 +397,29 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	}
 
 	/**
-	 * Open a new game. Initialize: letters[], stack_existed_words, score and
-	 * recLen
+	 * Open a new game.
 	 */
 	private void startNewGame() {
-		this.userName = this.getIntent().getStringExtra(Room.INTENT_USERNAME);
-		this.character = this.getIntent().getIntExtra(
-				PersistentBoggleGame.CHARACTER, ROOMMEMBER);
-		this.letters = this.getIntent()
-				.getStringExtra(PersistentBoggleGame.LETTERS).toCharArray();
-		if (letters.length != mode * mode)
-			this.letters = bbll.generateWords(mode);
-		this.existed_words = new LinkedHashSet<String>();
-		this.score = new Score(0);
-		this.recLen = getSharedPreferences("GAME_TIME", MODE_PRIVATE).getInt(
-				"TIME", GAMETIME);
-		// TODO: need to refresh it
-		getSharedPreferences("GAME_TIME", MODE_PRIVATE).edit()
-				.putInt("TIME", GAMETIME).commit();
+		try {
+			this.userName = this.getIntent().getStringExtra(
+					Room.INTENT_USERNAME);
+			this.character = this.getIntent().getIntExtra(
+					PersistentBoggleGame.CHARACTER, ROOMMEMBER);
+			this.letters = this.getIntent()
+					.getStringExtra(PersistentBoggleGame.LETTERS).toCharArray();
+			if (letters.length != mode * mode)
+				this.letters = bbll.generateWords(mode);
+			this.existed_words = new LinkedHashSet<String>();
+			this.score = new Score(0);
+			this.recLen = getSharedPreferences("GAME_TIME", MODE_PRIVATE)
+					.getInt("TIME", GAMETIME);
+			// need to refresh it
+			getSharedPreferences("GAME_TIME", MODE_PRIVATE).edit()
+					.putInt("TIME", GAMETIME).commit();
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleGame Start a New Game failed";
+			System.out.println(errorMessage);
+		}
 	}
 
 	/**
@@ -599,17 +612,10 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 						txt_Timer.setTextColor(Color.RED);
 					}
 					if (recLen == 0) {
-						// TODO:
 						// game over
 						// listener need cancel
-						// need to calculate scores
 						// need to update highest score
-						isPause = OVER;
-						wordGridView.gameOver(isPause, score.getScore(),
-								existed_words);
-						txt_Timer.setText("");
-						txt_wording.setText("");
-						networkTasksTimer.cancel();
+						gameOverHandler();
 					}
 					break;
 				}
@@ -646,6 +652,10 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 						txt_ExistedWords[i].setText(contentsOfTextView[i]);
 					}
 					break;
+				case NETWORK_TASKS_GAME_OVER:
+
+					wordGridView.updateRecord(gor);
+					break;
 				}
 			}
 		};
@@ -663,33 +673,59 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		timertask_NetworkTasks_UpdatePlayers = new TimerTask() {
 			@Override
 			public void run() {
-				UserGameStatus[] ugs = bbll.getPlayersStatus();
-				for (int i = 0; i < ugs.length; i++) {
-					if (ugs[i] == null)
-						continue;
-					ArrayList<String> current_words = ugs[i].getCurrentWords();
-					Iterator<String> it = current_words.iterator();
-					StringBuilder words_builder = new StringBuilder(
-							ugs[i].getUserName() + "\n" + "Score: "
-									+ ugs[i].getCurrentScore() + "\n"
-									+ "Existed Words:\n");
-					while (it.hasNext()) {
-						words_builder.append(it.next().toString());
-						words_builder.append("\n");
+				try {
+					UserGameStatus[] ugs = bbll.getPlayersStatus();
+					gor = new GameOverResult();
+					if (isPause == OVER) {
+						switch (ugs.length) {
+						case 0:
+							gor = bbll.formResult(userName, score.getScore(),
+									null, null);
+							break;
+						case 1:
+							gor = bbll.formResult(userName, score.getScore(),
+									ugs[0], null);
+							break;
+						case 2:
+							gor = bbll.formResult(userName, score.getScore(),
+									ugs[0], ugs[1]);
+							break;
+						}
+						Message msg = new Message();
+						msg.what = NETWORK_TASKS_GAME_OVER;
+						networkTasksHandler.sendMessage(msg);
+					} else {
+						for (int i = 0; i < ugs.length; i++) {
+							if (ugs[i] == null)
+								continue;
+							ArrayList<String> current_words = ugs[i]
+									.getCurrentWords();
+							Iterator<String> it = current_words.iterator();
+							StringBuilder words_builder = new StringBuilder(
+									ugs[i].getUserName() + "\n" + "Score: "
+											+ ugs[i].getCurrentScore() + "\n"
+											+ "Existed Words:\n");
+							while (it.hasNext()) {
+								words_builder.append(it.next().toString());
+								words_builder.append("\n");
+							}
+							contentsOfTextView[i] = words_builder.toString();
+							// txt_ExistedWords[i].setText(words_builder.toString());
+						}
+						Message msg = new Message();
+						msg.what = NETWORK_TASKS_UPDATE_PLAYER_INFO;
+						networkTasksHandler.sendMessage(msg);
 					}
-					contentsOfTextView[i] = words_builder.toString();
-					// txt_ExistedWords[i].setText(words_builder.toString());
+				} catch (Exception ex) {
+					System.out.println(ex.toString());
+					return;
 				}
-				Message msg = new Message();
-				msg.what = NETWORK_TASKS_UPDATE_PLAYER_INFO;
-				networkTasksHandler.sendMessage(msg);
 			}
 		};
 
 		networkTasksTimer = new Timer();
 		networkTasksTimer.schedule(timertask_NetworkTasks_UpdatePlayers, 1000,
 				3000);
-
 	}
 
 	/**
@@ -728,11 +764,66 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	 */
 	private void exitGame() {
 		Log.d(TAG, "Exit Affirmed!");
-		bbll.exitGame(character, this.userName);
-		timer.cancel();
-		finish();
+		try {
+			bbll.exitGame(character, this.userName);
+			finish();
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggle: exitGame failed";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+		}
 	}
 
+	/**
+	 * Stop Timer and TimerTasks
+	 */
+	private void stopTimerTasks() {
+		try {
+			if (tick_task != null)
+				tick_task.cancel();
+			if (timer != null)
+				timer.cancel();
+			if (timertask_NetworkTasks_UpdatePlayers != null)
+				timertask_NetworkTasks_UpdatePlayers.cancel();
+			if (networkTasksTimer != null)
+				networkTasksTimer.cancel();
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggle: stopTimerTasks Failed";
+			System.out.println(errorMessage);
+		}
+	}
+
+	/**
+	 * Doing this methods when the game is over
+	 */
+	private void gameOverHandler() {
+		try {
+			isPause = OVER;
+			UpdateTopScore uts = new UpdateTopScore();
+			uts.execute();
+			wordGridView.gameOver(isPause, score.getScore(), existed_words);
+			txt_Timer.setText("");
+			txt_wording.setText("");
+			if (tick_task != null)
+				tick_task.cancel();
+			if (timer != null)
+				timer.cancel();
+			System.out.println("Will update top score");
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggle: gameOverHandler Failed!";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+		}
+	}
+
+	// ---------------------------- AsyncTasks Part ---------------------------
+
+	/**
+	 * LoadDictionary by using AsyncTask
+	 * 
+	 * @author kevin
+	 * 
+	 */
 	private class LoacDictionary extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -740,12 +831,21 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 				bbll.loadDictionary(getResources().getAssets().open(
 						"SimpleBloomFilterFile.txt"));
 			} catch (Exception ex) {
+				System.out.println("Load Dictionary Failed!");
+				System.out.println(ex.toString());
 				return null;
 			}
 			return null;
 		}
 	}
 
+	/**
+	 * Find all the players who enter the game, then initialize Network listener
+	 * to detect other players movements
+	 * 
+	 * @author kevin
+	 * 
+	 */
 	private class InitializePlayersInfo extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
@@ -766,9 +866,28 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			ArrayList<String> array = new ArrayList<String>();
-			array.addAll(existed_words);
-			bbll.updateWordsToServer(userName, array, score.getScore());
+			try {
+				ArrayList<String> array = new ArrayList<String>();
+				array.addAll(existed_words);
+				bbll.updateWordsToServer(userName, array, score.getScore());
+			} catch (Exception ex) {
+				String errorMessage = "PersistentBoggle: Failed to add new words to remote server";
+				System.out.println(errorMessage);
+				System.out.println(ex.toString());
+			}
+			return null;
+		}
+	}
+
+	private class UpdateTopScore extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				bbll.updateTopScore(userName, score.getScore());
+				return null;
+			} catch (Exception ex) {
+				System.out.println(ex.toString());
+			}
 			return null;
 		}
 	}

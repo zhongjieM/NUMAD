@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -91,7 +92,6 @@ public class GameHall extends Activity implements OnClickListener {
 	private ListView lv;
 	RelativeLayout rl;
 
-	// TODO: userName have to be stored for resume when pressed HOME button
 	private String userName = "";
 	private ArrayList<RoomStatus> array_roomstatus;
 	private ArrayAdapter<RoomStatus> adapter_roomstatus;
@@ -110,14 +110,18 @@ public class GameHall extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		userName = this.getIntent().getStringExtra(GameHall.GAMEHALL_USERNAME);
-		if (userName != null) {
-			Log.d(TAG, "Successfully enter game hall as user: " + userName);
-			showSuccessfullyEnter();
-			gameHallBLL.ShowAllTables();
-		} else {
-			Log.d(TAG, "Fails to enter game hall with a valid user name.");
-			showFailureEnter();
+		try {
+			userName = this.getIntent().getStringExtra(
+					GameHall.GAMEHALL_USERNAME);
+			if (userName != null) {
+				Log.d(TAG, "Successfully enter game hall as user: " + userName);
+				showSuccessfullyEnter();
+			} else {
+				Log.d(TAG, "Fails to enter game hall with a valid user name.");
+				showFailureEnter();
+			}
+		} catch (Exception ex) {
+			printOutErrors("onCreate", ex);
 		}
 	}
 
@@ -133,14 +137,22 @@ public class GameHall extends Activity implements OnClickListener {
 		if (arg0.equals(btn_Back)) {
 			// quit the game hall, log off the game
 			setViewEnabled(false);
-			QuitGameHallAsyncTask quitHall = new QuitGameHallAsyncTask();
-			quitHall.execute();
+			try {
+				QuitGameHallAsyncTask quitHall = new QuitGameHallAsyncTask();
+				quitHall.execute();
+			} catch (Exception ex) {
+				printOutErrors("onClick quit game hall async task execute", ex);
+			}
 		} else if (arg0.equals(btn_CreateNewRoom)) {
 			// create a new room for the user himself
 			String[] params = { this.userName };
 			setViewEnabled(false);
-			CreateNewRoomAsyncTask createRoom = new CreateNewRoomAsyncTask();
-			createRoom.execute(params);
+			try {
+				CreateNewRoomAsyncTask createRoom = new CreateNewRoomAsyncTask();
+				createRoom.execute(params);
+			} catch (Exception ex) {
+				printOutErrors("onClick create room async task execute", ex);
+			}
 		}
 	}
 
@@ -151,30 +163,47 @@ public class GameHall extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		Log.d(TAG, "BACK PRESSED");
 		if (backButtonEnabled) {
-			QuitGameHallAsyncTask quitHall = new QuitGameHallAsyncTask();
-			quitHall.execute();
+			try {
+				QuitGameHallAsyncTask quitHall = new QuitGameHallAsyncTask();
+				quitHall.execute();
+			} catch (Exception ex) {
+				printOutErrors("onClick quit game hall async task execute", ex);
+
+			}
 		}
 	}
 
 	@Override
 	public void onPause() {
-		if (!isHomeNotPressed) {
-			serviceController = new ServiceController(this);
-			serviceController.startServiceForGameHall(userName);
-		} else
-			isHomeNotPressed = false;
-		timer.cancel();
+		try {
+			if (!isHomeNotPressed) {
+				serviceController = new ServiceController(this);
+				serviceController.startServiceForGameHall(userName);
+				serviceController
+						.stopServiceById(ServiceController.SERVICE_FOR_BACKGROUND_MUSIC);
+			} else
+				isHomeNotPressed = false;
+			if (timer != null)
+				timer.cancel();
+		} catch (Exception ex) {
+			printOutErrors("onPause", ex);
+		}
 		super.onPause();
 
 	}
 
 	@Override
 	public void onResume() {
-		serviceController = new ServiceController(this);
-		serviceController
-				.stopServiceById(ServiceController.SERVICE_FOR_GAMEHALL);
-		startThreadListerner();
-		setViewEnabled(true);
+		try {
+			serviceController = new ServiceController(this);
+			serviceController
+					.stopServiceById(ServiceController.SERVICE_FOR_GAMEHALL);
+			serviceController.startServiceForBackgroundMusic();
+			startThreadListerner();
+			setViewEnabled(true);
+		} catch (Exception ex) {
+			printOutErrors("onResume", ex);
+		}
 		super.onResume();
 	}
 
@@ -218,6 +247,7 @@ public class GameHall extends Activity implements OnClickListener {
 
 	private void initializeComponents() {
 		rl = new RelativeLayout(this);
+		rl.setBackgroundResource(R.drawable.persistentbogglebackground);
 		initializeRoomName(rl);
 		initializeNumberOfPlayers(rl);
 		initializeListView(rl);
@@ -237,6 +267,7 @@ public class GameHall extends Activity implements OnClickListener {
 		tv_roomName.setId(ROOM_NAME_TEXTVIEW_ID);
 		tv_roomName.setText("Room ID");
 		tv_roomName.setTextSize(screenHeight / TEXT_SIZE_RATE);
+		tv_roomName.setTextColor(Color.WHITE);
 		rl.addView(tv_roomName, rn_rllp);
 	}
 
@@ -251,10 +282,10 @@ public class GameHall extends Activity implements OnClickListener {
 		tv_numberOfPlayers = new TextView(this);
 		tv_numberOfPlayers.setText("Players");
 		tv_numberOfPlayers.setTextSize(screenHeight / TEXT_SIZE_RATE);
+		tv_numberOfPlayers.setTextColor(Color.WHITE);
 		rl.addView(tv_numberOfPlayers, nop_rllp);
 	}
 
-	// TODO: add background and other things to decorate list view
 	private void initializeListView(RelativeLayout rl) {
 		lv = new ListView(this);
 		lv.setId(LISTVIEW_ID);
@@ -268,8 +299,12 @@ public class GameHall extends Activity implements OnClickListener {
 				RoomStatus[] rss = new RoomStatus[1];
 				rss[0] = (RoomStatus) lv.getItemAtPosition(position);
 				setViewEnabled(false);
-				JoinARoom jar = new JoinARoom();
-				jar.execute(rss);
+				try {
+					JoinARoom jar = new JoinARoom();
+					jar.execute(rss);
+				} catch (Exception ex) {
+					printOutErrors("ListView onItemClickEvent", ex);
+				}
 			}
 
 		});
@@ -284,7 +319,6 @@ public class GameHall extends Activity implements OnClickListener {
 		rl.addView(lv, rllp);
 	}
 
-	// TODO: add color or image to the buttons
 	private void initializeBtnCreate(RelativeLayout rl) {
 		RelativeLayout.LayoutParams btn_create_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -293,6 +327,7 @@ public class GameHall extends Activity implements OnClickListener {
 		btn_create_rllp.leftMargin = screenWidth / 30;
 		btn_CreateNewRoom = new Button(this);
 		btn_CreateNewRoom.setText("Create");
+		btn_CreateNewRoom.setTextColor(Color.WHITE);
 		rl.addView(btn_CreateNewRoom, btn_create_rllp);
 	}
 
@@ -305,6 +340,7 @@ public class GameHall extends Activity implements OnClickListener {
 		btn_back_rllp.rightMargin = screenWidth / 40;
 		btn_Back = new Button(this);
 		btn_Back.setText("   Quit   ");
+		btn_Back.setTextColor(Color.WHITE);
 		rl.addView(btn_Back, btn_back_rllp);
 	}
 
@@ -353,14 +389,18 @@ public class GameHall extends Activity implements OnClickListener {
 		task_GetRooms = new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println("Thread1 running");
-				array_roomstatus = gameHallBLL.getRoomStatus();
-				if (array_roomstatus == null) {
-					array_roomstatus = new ArrayList<RoomStatus>();
+				try {
+					array_roomstatus = gameHallBLL.getRoomStatus();
+					if (array_roomstatus == null) {
+						array_roomstatus = new ArrayList<RoomStatus>();
+					}
+					Message msg = new Message();
+					msg.what = MESSAGE_GAMEHALL_GETROOMS;
+					handler.sendMessage(msg);
+				} catch (Exception ex) {
+					printOutErrors("TimerTask: GetRoomStatus", ex);
+					return;
 				}
-				Message msg = new Message();
-				msg.what = MESSAGE_GAMEHALL_GETROOMS;
-				handler.sendMessage(msg);
 			}
 		};
 		timer.schedule(task_GetRooms, 1000, 2000);
@@ -374,16 +414,20 @@ public class GameHall extends Activity implements OnClickListener {
 		task_GetInvitation = new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println("Thread2 running");
-				String temp = gameHallBLL.checkInvitation();
-				if (temp != null) {
-					invitation = temp.intern();
-					Message msg = new Message();
-					msg.what = GameHall.MESSAGE_GAMEHALL_INVITATION;
-					handler.sendMessage(msg);
-				} else {
-					// no invitation
-					// System.out.println("invitation is empty");
+				try {
+					String temp = gameHallBLL.checkInvitation();
+					if (temp != null) {
+						invitation = temp.intern();
+						Message msg = new Message();
+						msg.what = GameHall.MESSAGE_GAMEHALL_INVITATION;
+						handler.sendMessage(msg);
+					} else {
+						// no invitation
+						// System.out.println("invitation is empty");
+					}
+				} catch (Exception ex) {
+					printOutErrors("TimerTask: CheckInvitation", ex);
+					return;
 				}
 			}
 		};
@@ -394,24 +438,33 @@ public class GameHall extends Activity implements OnClickListener {
 	 * Get invitation and show the invitation in a dialog box
 	 */
 	private void getInvitation() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(invitation + " is inviting you!");
-		builder.setTitle("You get an invitation");
-		builder.setPositiveButton("Accept",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						RoomStatus rs = gameHallBLL.getRoomInfo(invitation);
-						if (rs == null) {
-							// can't find that room, do nothing
-						} else {
-							JoinARoom jar = new JoinARoom();
-							jar.execute(rs);
+		try {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(invitation + " is inviting you!");
+			builder.setTitle("You get an invitation");
+			builder.setPositiveButton("Accept",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							RoomStatus rs = gameHallBLL.getRoomInfo(invitation);
+							if (rs == null) {
+								// can't find that room, do nothing
+							} else {
+								try {
+									JoinARoom jar = new JoinARoom();
+									jar.execute(rs);
+								} catch (Exception ex) {
+									System.out.println(ex.toString());
+								}
+							}
 						}
-					}
-				});
-		builder.setCancelable(true);
-		builder.show();
+					});
+			builder.setCancelable(true);
+			builder.show();
+		} catch (Exception ex) {
+			printOutErrors("getInvitatioin", ex);
+			return;
+		}
 	}
 
 	/**
@@ -447,6 +500,17 @@ public class GameHall extends Activity implements OnClickListener {
 		btn_Back.setEnabled(enabled);
 		btn_CreateNewRoom.setEnabled(enabled);
 		lv.setEnabled(enabled);
+	}
+
+	/**
+	 * Show Error and Exception trace information
+	 * 
+	 * @param errorPartName
+	 * @param ex
+	 */
+	private void printOutErrors(String errorPartName, Exception ex) {
+		System.out.println("GameHall " + errorPartName + " Failed");
+		System.out.println(ex.toString());
 	}
 
 	// ------------------ AsyncTask Part --------------------------------------
@@ -494,11 +558,8 @@ public class GameHall extends Activity implements OnClickListener {
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
 			if (result) {
-				// for test use only
-				gameHallBLL.ShowAllTables();
 				finishActivity();
 			} else {
-				// TODO: fails to quit
 				showToast(
 						"Fails to quit, please try latter or directly go back",
 						GameHall.FAIL_TO_QUIT);

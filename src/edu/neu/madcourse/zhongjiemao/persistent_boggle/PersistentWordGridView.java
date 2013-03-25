@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import edu.neu.madcourse.zhongjiemao.R;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.SoundEffect;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GameOverResult;
 
 /*
  * The approach of having one view for the entire puzzle and
@@ -76,6 +77,8 @@ public class PersistentWordGridView extends View {
 	private int longestLength;
 	// to store the longest word then the game is over.
 	private String longestword;
+
+	private GameOverResult gor;
 
 	// -------------------------------------------------------------------------
 	// -------------------------- Constructor ----------------------------------
@@ -225,6 +228,11 @@ public class PersistentWordGridView extends View {
 		this.invalidate();
 	}
 
+	public void updateRecord(GameOverResult gor) {
+		this.gor = gor;
+		invalidate();
+	}
+
 	// -------------------------------------------------------------------------
 	// ------------------------Private Methods Part-----------------------------
 	// -------------------------------------------------------------------------
@@ -371,17 +379,14 @@ public class PersistentWordGridView extends View {
 		foreground.setTextSize(squareSideLength / 4);
 		foreground.setColor(Color.GREEN);
 		// Draw Score Text
-		drawScoreText(canvas, foreground, x, y);
+		drawYourScore(canvas, foreground, x, y);
 		// Draw Longest Length Text
-		drawLongestLengthText(canvas, foreground, x, y);
+		drawPlayer2Score(canvas, foreground, x, y);
 		// Draw Longest Word Text
-		drawLongestwordText(canvas, foreground, x, y);
+		drawPlayer3Score(canvas, foreground, x, y);
 
 		foreground.setTextSize(squareSideLength / 3);
 		foreground.setTextAlign(Paint.Align.CENTER);
-		// Draw Comments
-		drawCommentsText(canvas, foreground, x, y);
-
 	}
 
 	private void drawSelection(Canvas canvas) {
@@ -408,40 +413,37 @@ public class PersistentWordGridView extends View {
 		canvas.drawText(result, x, y, foreground);
 	}
 
-	private void drawScoreText(Canvas canvas, Paint foreground, float x, float y) {
+	private void drawYourScore(Canvas canvas, Paint foreground, float x, float y) {
+		if (gor == null)
+			return;
 		y = this.getHeight() / 4 + this.getHeight() * 3 / 16;
-		String result = "Score : " + this.score;
+		String result = "Your Score : " + gor.getYourScore();
 		canvas.drawText(result, x, y, foreground);
 	}
 
-	private void drawLongestLengthText(Canvas canvas, Paint foreground,
-			float x, float y) {
+	private void drawPlayer2Score(Canvas canvas, Paint foreground, float x,
+			float y) {
+		if (gor == null)
+			return;
 		y = this.getHeight() / 4 + this.getHeight() * 5 / 16;
-		String result = "Longest Length : " + this.longestLength;
-		canvas.drawText(result, x, y, foreground);
-	}
-
-	private void drawLongestwordText(Canvas canvas, Paint foreground, float x,
-			float y) {
-		y = this.getHeight() / 4 + this.getHeight() * 7 / 16;
-		String result = "Longest Word : " + this.longestword;
-		canvas.drawText(result, x, y, foreground);
-	}
-
-	private void drawCommentsText(Canvas canvas, Paint foreground, float x,
-			float y) {
-		x = this.getWidth() / 2;
-		y = this.getHeight() / 4 + this.getHeight() * 10 / 16;
-		String result = "";
-		if (this.score > 10) {
-			result = "GOOD JOB!";
-		} else if (this.score < 3) {
-			result = "You Can Do Better!";
-			foreground.setColor(Color.RED);
-		} else {
-			result = "Mediam";
-			foreground.setColor(Color.YELLOW);
+		if (gor.getPlayer2Name().intern() == "") {
+			canvas.drawText("No Player", x, y, foreground);
+			return;
 		}
+		String result = gor.getPlayer2Name() + " : " + gor.getPlayer2Score();
+		canvas.drawText(result, x, y, foreground);
+	}
+
+	private void drawPlayer3Score(Canvas canvas, Paint foreground, float x,
+			float y) {
+		if (gor == null)
+			return;
+		y = this.getHeight() / 4 + this.getHeight() * 7 / 16;
+		if (gor.getPlayer3Name().intern() == "") {
+			canvas.drawText("No Player", x, y, foreground);
+			return;
+		}
+		String result = gor.getPlayer3Name() + " : " + gor.getPlayer3Score();
 		canvas.drawText(result, x, y, foreground);
 	}
 
@@ -473,7 +475,12 @@ public class PersistentWordGridView extends View {
 	 * @return true if it can be reached from the previous node
 	 */
 	private boolean reachable(int current_index) {
-		return reachable[previous_position][current_index];
+		try {
+			return reachable[previous_position][current_index];
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
+		}
 	}
 
 	/**

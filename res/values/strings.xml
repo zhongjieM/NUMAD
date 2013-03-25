@@ -78,5 +78,6 @@ row, each column, and each of the 3x3 boxes
     <string name="title_activity_room">Room</string>
     <string name="title_activity_invitation_dialog">InvitationDialog</string>
     <string name="title_activity_persistent_boggle_game">Persistent Boggle</string>
+    <string name="title_activity_persistent_boggle_history">PersistentBoggleHistory</string>
 
 </resources>

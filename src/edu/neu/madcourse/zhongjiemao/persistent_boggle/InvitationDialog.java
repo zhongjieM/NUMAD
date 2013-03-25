@@ -70,6 +70,19 @@ public class InvitationDialog extends Activity {
 		return null;
 	}
 
+	@Override
+	public void onPause() {
+		try {
+			if (thread_invite != null)
+				thread_invite.cancel();
+			if (timer != null)
+				timer.cancel();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
+		super.onPause();
+	}
+
 	// ------------------ Private Methods --------------------------
 	private void initializeParameters() {
 		userName = this.getIntent().getStringExtra(InvitationDialog.USERNAME)
@@ -88,9 +101,12 @@ public class InvitationDialog extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				String invite = (String) lv.getItemAtPosition(position);
-			
-				InviteSomeOne iso = new InviteSomeOne();
-				iso.execute(invite);
+				try {
+					InviteSomeOne iso = new InviteSomeOne();
+					iso.execute(invite);
+				} catch (Exception ex) {
+					System.out.println(ex.toString());
+				}
 			}
 		});
 		rl.addView(lv);
@@ -114,11 +130,14 @@ public class InvitationDialog extends Activity {
 		thread_invite = new TimerTask() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				array_ous = roomBLL.getAllAvailableUser();
-				Message msg = new Message();
-				msg.what = THREAD_INVITE;
-				handler.sendMessage(msg);
+				try {
+					array_ous = roomBLL.getAllAvailableUser();
+					Message msg = new Message();
+					msg.what = THREAD_INVITE;
+					handler.sendMessage(msg);
+				} catch (Exception ex) {
+					System.out.println(ex.toString());
+				}
 			}
 		};
 		timer = new Timer();
@@ -127,16 +146,24 @@ public class InvitationDialog extends Activity {
 	}
 
 	private void updateListView() {
-		Iterator<OnLineUser> it_avals = array_ous.iterator();
-		array_OnlineUsers = new ArrayList<String>();
-		while (it_avals.hasNext()) {
-			OnLineUser ou = it_avals.next();
-			if (ou.getInGame().equals(false))
-				array_OnlineUsers.add(ou.getUserName());
+		try {
+			if (array_ous == null)
+				return;
+			Iterator<OnLineUser> it_avals = array_ous.iterator();
+			array_OnlineUsers = new ArrayList<String>();
+			while (it_avals.hasNext()) {
+				OnLineUser ou = it_avals.next();
+				if (ou.getInGame().equals(false))
+					array_OnlineUsers.add(ou.getUserName());
+			}
+			adapter = new ArrayAdapter<String>(this,
+					R.layout.invitationlist_layout, array_OnlineUsers);
+			lv.setAdapter(adapter);
+		} catch (Exception ex) {
+			String errorMessage = "Invitation Dialog Update ListView Failed";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
 		}
-		adapter = new ArrayAdapter<String>(this,
-				R.layout.invitationlist_layout, array_OnlineUsers);
-		lv.setAdapter(adapter);
 	}
 
 	// ------------------ AsyncTask Part ---------------------------

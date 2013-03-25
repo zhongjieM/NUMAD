@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -110,41 +111,56 @@ public class Room extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		// TODO:
-		isHomeNotPressed = true;
-		switch (arg0.getId()) {
-		case BUTTON_STARTID:
-			openNewGameDialog();
-			break;
-		case BUTTON_INVITEID:
-			Intent i = new Intent(this, InvitationDialog.class);
-			i.putExtra(InvitationDialog.ROOMID, this.roomID);
-			i.putExtra(InvitationDialog.USERNAME, this.userName);
-			startActivity(i);
-			break;
-		case BUTTON_QUITID:
-			quitRoom();
-			break;
+		try {
+			isHomeNotPressed = true;
+			switch (arg0.getId()) {
+			case BUTTON_STARTID:
+				openNewGameDialog();
+				break;
+			case BUTTON_INVITEID:
+				Intent i = new Intent(this, InvitationDialog.class);
+				i.putExtra(InvitationDialog.ROOMID, this.roomID);
+				i.putExtra(InvitationDialog.USERNAME, this.userName);
+				startActivity(i);
+				break;
+			case BUTTON_QUITID:
+				quitRoom();
+				break;
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
 		}
 	}
 
 	@Override
 	public void onPause() {
-		if (!isHomeNotPressed) {
-			String[] params = { roomID, userName };
-			serviceController = new ServiceController(this);
-			serviceController.startServiceForRoom(params);
-		} else
-			isHomeNotPressed = false;
-		timer.cancel();
+		try {
+			if (!isHomeNotPressed) {
+				String[] params = { roomID, userName };
+				serviceController = new ServiceController(this);
+				serviceController.startServiceForRoom(params);
+				serviceController
+						.stopServiceById(ServiceController.SERVICE_FOR_BACKGROUND_MUSIC);
+			} else
+				isHomeNotPressed = false;
+			timer.cancel();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
 		super.onStop();
 	}
 
 	@Override
 	public void onResume() {
-		serviceController = new ServiceController(this);
-		serviceController.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
-		startThreadListener();
+		try {
+			serviceController = new ServiceController(this);
+			serviceController
+					.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
+			serviceController.startServiceForBackgroundMusic();
+			startThreadListener();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
 		super.onStart();
 	}
 
@@ -176,6 +192,7 @@ public class Room extends Activity implements OnClickListener {
 
 	private void initializeViewComponents() {
 		rl = new RelativeLayout(this);
+		rl.setBackgroundResource(R.drawable.persistentbogglebackground);
 		initializeTextViews(rl);
 		initializeBtnStart(rl);
 		initializeBtnInvite(rl);
@@ -196,6 +213,7 @@ public class Room extends Activity implements OnClickListener {
 			textView[i * 2].setId(TEXTVIEW_STARTID + i * 2);
 			textView[i * 2].setText(_string_textView_text[i]);
 			textView[i * 2].setTextSize(screenHeight / TEXT_SIZE_RATE);
+			textView[i * 2].setTextColor(Color.WHITE);
 			textView_lp[i * 2] = new LayoutParams(LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT);
 			textView_lp[i * 2].addRule(RelativeLayout.ALIGN_PARENT_LEFT);
@@ -208,6 +226,7 @@ public class Room extends Activity implements OnClickListener {
 			textView[i * 2 + 1].setId(TEXTVIEW_STARTID + i * 2 + 1);
 			textView[i * 2 + 1].setText(string_textView_text[i]);
 			textView[i * 2 + 1].setTextSize(screenHeight / TEXT_SIZE_RATE);
+			textView[i * 2 + 1].setTextColor(Color.WHITE);
 			textView_lp[i * 2 + 1] = new LayoutParams(
 					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			textView_lp[i * 2 + 1].leftMargin = screenWidth * 9 / 14;
@@ -221,6 +240,7 @@ public class Room extends Activity implements OnClickListener {
 		btn_Start = new Button(this);
 		btn_Start.setText("Start");
 		btn_Start.setId(BUTTON_STARTID);
+		btn_Start.setTextColor(Color.WHITE);
 		LayoutParams param = new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		param.addRule(RelativeLayout.BELOW, textView[9].getId());
@@ -235,6 +255,7 @@ public class Room extends Activity implements OnClickListener {
 		btn_Invite = new Button(this);
 		btn_Invite.setText("Invite");
 		btn_Invite.setId(BUTTON_INVITEID);
+		btn_Invite.setTextColor(Color.WHITE);
 		LayoutParams param = new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		param.addRule(RelativeLayout.BELOW, textView[9].getId());
@@ -250,6 +271,7 @@ public class Room extends Activity implements OnClickListener {
 		btn_Quit = new Button(this);
 		btn_Quit.setText(" Quit ");
 		btn_Quit.setId(BUTTON_QUITID);
+		btn_Quit.setTextColor(Color.WHITE);
 		LayoutParams param = new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		param.addRule(RelativeLayout.BELOW, textView[9].getId());
@@ -266,40 +288,51 @@ public class Room extends Activity implements OnClickListener {
 	}
 
 	private void updateTextView(RoomStatus room) {
-		if (room != null) {
-			textView[1].setText(room.getRoomID());
-			textView[3].setText(String.valueOf(room.getNumberOfPlayers()));
-			textView[5]
-					.setText(room.getPlayer1().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
-							: room.getPlayer1());
-			textView[7]
-					.setText(room.getPlayer2().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
-							: room.getPlayer2());
-			textView[9]
-					.setText(room.getPlayer3().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
-							: room.getPlayer3());
+		try {
+			if (room != null) {
+				textView[1].setText(room.getRoomID());
+				textView[3].setText(String.valueOf(room.getNumberOfPlayers()));
+				textView[5]
+						.setText(room.getPlayer1().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
+								: room.getPlayer1());
+				textView[7]
+						.setText(room.getPlayer2().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
+								: room.getPlayer2());
+				textView[9]
+						.setText(room.getPlayer3().intern() == RoomStatus.DEFAULT_PLAYER ? this.NO_PLAYER
+								: room.getPlayer3());
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
 		}
 	}
 
 	private void checkStatus(int status) {
-		switch (status) {
-		case RoomBLL.STATUS_ROOM_NOT_EXIST:
-			// go back to game hall and toast
-			showToast("Sorry the room no longer exists!");
-			timer.cancel();
-			roomBLL.updateONLINEUSERtoNotInGame();
-			finish();
-			break;
-		case RoomBLL.STATUS_GAME_START:
-			// TODO: start a new game
-			startGameAsMember();
-			break;
-		case RoomBLL.STATUS_YOU_ARE_MASTER:
-			// activate btn_Start
-			break;
-		default:
-			// MEMBER, but IDENTITY NO CHANGE
-			break;
+		try {
+			switch (status) {
+			case RoomBLL.STATUS_ROOM_NOT_EXIST:
+				// go back to game hall and toast
+				showToast("Sorry the room no longer exists!");
+				if (timer != null)
+					timer.cancel();
+				roomBLL.updateONLINEUSERtoNotInGame();
+				finish();
+				break;
+			case RoomBLL.STATUS_GAME_START:
+				// TODO: start a new game
+				startGameAsMember();
+				break;
+			case RoomBLL.STATUS_YOU_ARE_MASTER:
+				// activate btn_Start
+				break;
+			default:
+				// MEMBER, but IDENTITY NO CHANGE
+				break;
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
 		}
 	}
 
@@ -324,11 +357,16 @@ public class Room extends Activity implements OnClickListener {
 		task_GetRoomStatus = new TimerTask() {
 			@Override
 			public void run() {
-				room = roomBLL.getRoomStatus();
-				roomStatus = roomBLL.checkCurrentRoomStatus();
-				Message msg = new Message();
-				msg.what = Room.TASK_CHECK_ROOM_STATUS;
-				handler.sendMessage(msg);
+				try {
+					room = roomBLL.getRoomStatus();
+					roomStatus = roomBLL.checkCurrentRoomStatus();
+					Message msg = new Message();
+					msg.what = Room.TASK_CHECK_ROOM_STATUS;
+					handler.sendMessage(msg);
+				} catch (Exception ex) {
+					System.out.println(ex.toString());
+					return;
+				}
 			}
 		};
 		timer = new Timer();
@@ -337,10 +375,16 @@ public class Room extends Activity implements OnClickListener {
 	}
 
 	private void quitRoom() {
-		timer.cancel();
-		setViewEnabled(false);
-		QuitRoomAsyncTask qrat = new QuitRoomAsyncTask();
-		qrat.execute();
+		try {
+			if (timer != null)
+				timer.cancel();
+			setViewEnabled(false);
+			QuitRoomAsyncTask qrat = new QuitRoomAsyncTask();
+			qrat.execute();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
+		}
 	}
 
 	private void setViewEnabled(Boolean enabled) {
@@ -368,17 +412,26 @@ public class Room extends Activity implements OnClickListener {
 	 * Ask the user what difficulty level they want
 	 * */
 	private void openNewGameDialog() {
-		new AlertDialog.Builder(this).setTitle("Start a New Game")
-				.setItems(R.array.board, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialoginterface, int i) {
-						if (roomBLL.createNewGame(i + 4, roomID)) {
-							startNewGame(i + 4, roomID, roomBLL.getLetters(),
-									PersistentBoggleGame.ROOMMASTER);
-						} else {
-							showToast("Sorry! You can't start right now!");
-						}
-					}
-				}).show();
+		try {
+			new AlertDialog.Builder(this)
+					.setTitle("Start a New Game")
+					.setItems(R.array.board,
+							new DialogInterface.OnClickListener() {
+								public void onClick(
+										DialogInterface dialoginterface, int i) {
+									if (roomBLL.createNewGame(i + 4, roomID)) {
+										startNewGame(i + 4, roomID,
+												roomBLL.getLetters(),
+												PersistentBoggleGame.ROOMMASTER);
+									} else {
+										showToast("Sorry! You can't start right now!");
+									}
+								}
+							}).show();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
+		}
 	}
 
 	/**
@@ -389,32 +442,46 @@ public class Room extends Activity implements OnClickListener {
 	 */
 	private void startNewGame(int mode, String roomID, String letters,
 			int character) {
-		timer.cancel();
-		if (roomBLL.startGameOperation(userName)) {
-			isHomeNotPressed = true;
-			Intent in = new Intent(getApplicationContext(),
-					PersistentBoggleGame.class);
-			in.putExtra(Room.INTENT_USERNAME, this.userName);
-			in.putExtra(PersistentBoggleGame.GAMEMODE, mode);
-			in.putExtra(INTENT_ROOMID, roomID);
-			in.putExtra(PersistentBoggleGame.LETTERS, letters);
-			in.putExtra(PersistentBoggleGame.CHARACTER, character);
-			startActivity(in);
-		} else {
-			showToast("Sorry! You can't start right now!");
+		try {
+			if (timer != null)
+				timer.cancel();
+			if (roomBLL.startGameOperation(userName)) {
+				new ServiceController(this)
+						.stopServiceById(ServiceController.SERVICE_FOR_BACKGROUND_MUSIC);
+				isHomeNotPressed = true;
+				Intent in = new Intent(getApplicationContext(),
+						PersistentBoggleGame.class);
+				in.putExtra(Room.INTENT_USERNAME, this.userName);
+				in.putExtra(PersistentBoggleGame.GAMEMODE, mode);
+				in.putExtra(INTENT_ROOMID, roomID);
+				in.putExtra(PersistentBoggleGame.LETTERS, letters);
+				in.putExtra(PersistentBoggleGame.CHARACTER, character);
+				startActivity(in);
+			} else {
+				showToast("Sorry! You can't start right now!");
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
 		}
 	}
 
 	private void startGameAsMember() {
-		serviceController.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
-		if (!roomBLL.startable())
+		try {
+			serviceController
+					.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
+			if (!roomBLL.startable())
+				return;
+			String letters = roomBLL.getLettersFromServer(roomID);
+			while (letters == null) {
+				letters = roomBLL.getLettersFromServer(roomID);
+			}
+			startNewGame((int) Math.sqrt(letters.length()), roomID, letters,
+					PersistentBoggleGame.ROOMMEMBER);
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
 			return;
-		String letters = roomBLL.getLettersFromServer(roomID);
-		while (letters == null) {
-			letters = roomBLL.getLettersFromServer(roomID);
 		}
-		startNewGame((int) Math.sqrt(letters.length()), roomID, letters,
-				PersistentBoggleGame.ROOMMEMBER);
 	}
 
 	private class QuitRoomAsyncTask extends AsyncTask<Void, Void, Boolean> {

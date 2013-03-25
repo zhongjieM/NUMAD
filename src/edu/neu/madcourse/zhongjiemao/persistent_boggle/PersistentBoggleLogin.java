@@ -3,6 +3,7 @@ package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -17,7 +18,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
+import edu.neu.madcourse.zhongjiemao.boggle.BoggleAbout;
+import edu.neu.madcourse.zhongjiemao.boggle.BoggleAcknowledgement;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.LoginBLL;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.test.PersistentBoggleTest;
 
 /**
@@ -50,6 +54,10 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	// Button: show the test activity of persistent boggle.
 	private Button btn_test;
 
+	private Button btn_history;
+	private Button btn_ack;
+	private Button btn_about;
+
 	// EditText: to get the input of user name from the player
 	private EditText et_username;
 	// TextView: to show player the place to type his user name
@@ -60,6 +68,8 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	private RelativeLayout rly;
 
 	private LoginBLL lbll;
+
+	private Boolean buttonClicked = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +88,22 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		getMenuInflater()
 				.inflate(R.menu.activity_persistent_boggle_login, menu);
 		return true;
+	}
+
+	@Override
+	public void onResume() {
+		new ServiceController(this).startServiceForBackgroundMusic();
+		super.onResume();
+	}
+
+	@Override
+	public void onPause() {
+		if (!buttonClicked) {
+			new ServiceController(this)
+					.stopServiceById(ServiceController.SERVICE_FOR_BACKGROUND_MUSIC);
+		} else
+			buttonClicked = false;
+		super.onPause();
 	}
 
 	/**
@@ -104,9 +130,13 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 				R.layout.activity_persistent_boggle_login, null);
 
 		rly = (RelativeLayout) ly;
+		rly.setBackgroundResource(R.drawable.persistentbogglebackground);
 		initializeTextViewUSR(rly);
 		initializeETUser(rly);
 		initializeBtnLogin(rly);
+		initializeBtnAck(rly);
+		initializeBtnAbout(rly);
+		initializeBtnHistory(rly);
 		initializeBtnBack(rly);
 		initializeBtnTest(rly);
 		initializeBtnOnClickEvents();
@@ -125,10 +155,11 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		tv_usr.setText("User Name: ");
 		tv_usr.setTextSize(screenWidth / 35);
 		tv_usr.setId(1);
+		tv_usr.setTextColor(Color.WHITE);
 		RelativeLayout.LayoutParams tv_usr_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		tv_usr_rllp.topMargin = this.screenHeight / 5 + 13;
+		tv_usr_rllp.topMargin = this.screenHeight / 10 + 13;
 		tv_usr_rllp.leftMargin = this.screenWidth / 10;
 		rly.addView(tv_usr, tv_usr_rllp);
 	}
@@ -144,10 +175,13 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		et_username.setTextSize(this.screenWidth / 35);
 		et_username.setMinWidth(this.screenWidth * 2 / 5);
 		et_username.setId(3);
+		et_username.setTextColor(Color.WHITE);
+		et_username.setBackgroundColor(getResources().getColor(
+				R.color.persistent_boggle_edit_text));
 		RelativeLayout.LayoutParams et_username_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		et_username_rllp.topMargin = this.screenHeight / 5;
+		et_username_rllp.topMargin = this.screenHeight / 10;
 		et_username_rllp.addRule(RelativeLayout.RIGHT_OF, tv_usr.getId());
 		rly.addView(et_username, et_username_rllp);
 	}
@@ -162,13 +196,59 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		btn_login.setText("Login");
 		btn_login.setWidth(this.screenWidth * 2 / 5);
 		btn_login.setId(10);
+		btn_login.setTextColor(Color.WHITE);
 		RelativeLayout.LayoutParams btn_login_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		btn_login_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 		btn_login_rllp.addRule(RelativeLayout.BELOW, et_username.getId());
-		btn_login_rllp.topMargin = this.screenHeight / 10;
+		btn_login_rllp.topMargin = this.screenHeight / 30;
 		rly.addView(btn_login, btn_login_rllp);
+	}
+
+	private void initializeBtnAck(RelativeLayout rly) {
+		btn_ack = new Button(this);
+		btn_ack.setText("Acknowledge");
+		btn_ack.setWidth(this.screenWidth * 2 / 5);
+		btn_ack.setId(14);
+		btn_ack.setTextColor(Color.WHITE);
+		RelativeLayout.LayoutParams btn_ack_rllp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		btn_ack_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		btn_ack_rllp.addRule(RelativeLayout.BELOW, btn_login.getId());
+		btn_ack_rllp.topMargin = this.screenHeight / 30;
+		rly.addView(btn_ack, btn_ack_rllp);
+	}
+
+	private void initializeBtnAbout(RelativeLayout rly) {
+		btn_about = new Button(this);
+		btn_about.setText("About");
+		btn_about.setWidth(this.screenWidth * 2 / 5);
+		btn_about.setId(15);
+		btn_about.setTextColor(Color.WHITE);
+		RelativeLayout.LayoutParams btn_about_rllp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		btn_about_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		btn_about_rllp.addRule(RelativeLayout.BELOW, btn_ack.getId());
+		btn_about_rllp.topMargin = this.screenHeight / 30;
+		rly.addView(btn_about, btn_about_rllp);
+	}
+
+	private void initializeBtnHistory(RelativeLayout rly) {
+		btn_history = new Button(this);
+		btn_history.setText("History");
+		btn_history.setWidth(this.screenWidth * 2 / 5);
+		btn_history.setId(16);
+		btn_history.setTextColor(Color.WHITE);
+		RelativeLayout.LayoutParams btn_his_rllp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+		btn_his_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		btn_his_rllp.addRule(RelativeLayout.BELOW, btn_about.getId());
+		btn_his_rllp.topMargin = this.screenHeight / 30;
+		rly.addView(btn_history, btn_his_rllp);
 	}
 
 	/**
@@ -181,12 +261,13 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		btn_back.setText("Back");
 		btn_back.setWidth(this.screenWidth * 2 / 5);
 		btn_back.setId(12);
+		btn_back.setTextColor(Color.WHITE);
 		RelativeLayout.LayoutParams btn_bakc_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		btn_bakc_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		btn_bakc_rllp.addRule(RelativeLayout.BELOW, btn_login.getId());
-		btn_bakc_rllp.topMargin = this.screenHeight / 20;
+		btn_bakc_rllp.addRule(RelativeLayout.BELOW, btn_history.getId());
+		btn_bakc_rllp.topMargin = this.screenHeight / 30;
 		rly.addView(btn_back, btn_bakc_rllp);
 	}
 
@@ -195,11 +276,12 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 		btn_test.setText("Test");
 		btn_test.setWidth(this.screenWidth * 2 / 5);
 		btn_test.setId(13);
+		btn_test.setVisibility(Button.INVISIBLE);
 		RelativeLayout.LayoutParams btn_test_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
 		btn_test_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		btn_test_rllp.addRule(RelativeLayout.BELOW, btn_back.getId());
+		btn_test_rllp.addRule(RelativeLayout.BELOW);
 		btn_test_rllp.topMargin = this.screenHeight / 20;
 		rly.addView(btn_test, btn_test_rllp);
 	}
@@ -209,19 +291,40 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 */
 	private void initializeBtnOnClickEvents() {
 		btn_login.setOnClickListener(this);
+		btn_ack.setOnClickListener(this);
+		btn_about.setOnClickListener(this);
+		btn_history.setOnClickListener(this);
 		btn_back.setOnClickListener(this);
 		btn_test.setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View arg0) {
+		buttonClicked = true;
 		if (arg0.equals(btn_login)) {
+			buttonClicked = true;
 			// check whether the user name and password match.
 			Log.d(TAG, "Login Attempt");
 			loginAttempt();
 		}
+		if (arg0.equals(btn_ack)) {
+			buttonClicked = true;
+			Intent i = new Intent(this, BoggleAcknowledgement.class);
+			startActivity(i);
+		}
+		if (arg0.equals(btn_about)) {
+			buttonClicked = true;
+			Intent i = new Intent(this, BoggleAbout.class);
+			startActivity(i);
+		}
+		if (arg0.equals(btn_history)) {
+			buttonClicked = true;
+			Intent i = new Intent(this, PersistentBoggleHistory.class);
+			startActivity(i);
+		}
 		if (arg0.equals(btn_back)) {
 			Log.d(TAG, "Quit the game");
+			buttonClicked = false;
 			this.finish();
 		}
 		if (arg0.equals(btn_test)) {
@@ -235,6 +338,10 @@ public class PersistentBoggleLogin extends Activity implements OnClickListener {
 	 */
 	private void loginAttempt() {
 		String usr = et_username.getText().toString();
+		if (usr.intern() == "test") {
+			btn_test.setVisibility(Button.VISIBLE);
+			return;
+		}
 		LoginAsyncTask login = new LoginAsyncTask();
 		if (usr.length() < 5) {
 			// here should send a toast to notify person that user name should

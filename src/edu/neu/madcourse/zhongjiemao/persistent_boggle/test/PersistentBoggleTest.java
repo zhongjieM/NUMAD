@@ -122,9 +122,9 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 	private void initializeRemoteServer() {
 		if (clearRemoteServerData()) {
 			// Initialize All the tables with some dirty data
-			UserInfo ui1 = new UserInfo("kevin", "000000", 0);
-			UserInfo ui2 = new UserInfo("robbins", "000000", 0);
-			UserInfo ui3 = new UserInfo("chen", "000001", 0);
+			UserInfo ui1 = new UserInfo("kevin", "000000", 11);
+			UserInfo ui2 = new UserInfo("robbins", "000000", 26);
+			UserInfo ui3 = new UserInfo("chen", "000001", 15);
 			gsonHelper.addNewRecordToTable(GsonHelper.USERINFO, ui1);
 			gsonHelper.addNewRecordToTable(GsonHelper.USERINFO, ui2);
 			gsonHelper.addNewRecordToTable(GsonHelper.USERINFO, ui3);

@@ -71,30 +71,6 @@ public class GsonHelper {
 			return null;
 	}
 
-	// /**
-	// * Given a room id, check if the game in this room has started
-	// *
-	// * @param roomID
-	// * @return if started, return an object of RoomStatus of this room. or
-	// null,
-	// * if the game has not yet started.
-	// */
-	// public RoomStatus getGameByRoomID(String roomID) {
-	// try {
-	// if (KeyValueAPI.isServerAvailable()) {
-	// String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID)
-	// .intern();
-	// if (jString != "") {
-	// System.out.println("Test GsonHelper: " + jString);
-	// return gson.fromJson(jString, RoomStatus.class);
-	// }
-	// }
-	// return null;
-	// } catch (Exception ex) {
-	// return null;
-	// }
-	// }
-
 	/**
 	 * Given the primary key of a table, check if it has a matched record in the
 	 * given table
@@ -132,28 +108,6 @@ public class GsonHelper {
 			return addNewRoomStatusToROOMSTATUS((RoomStatus) obj);
 		}
 	}
-
-	// /**
-	// * Register a new Game to server according to roomID
-	// *
-	// * @param roomID
-	// * @param rs
-	// * @return true if register successfully or false if not.
-	// */
-	// public Boolean addNewGame(String roomID, RoomStatus rs) {
-	// try {
-	// if (KeyValueAPI.isServerAvailable()) {
-	// if (getGameByRoomID(roomID) == null) {
-	// String jString = gson.toJson(rs);
-	// KeyValueAPI.put(TEAMNAME, PASSWORD, roomID, jString);
-	// return true;
-	// }
-	// }
-	// return false;
-	// } catch (Exception ex) {
-	// return false;
-	// }
-	// }
 
 	/**
 	 * Clear all the tables. This is just for test use.
@@ -212,7 +166,9 @@ public class GsonHelper {
 	 * @return
 	 */
 	public Boolean updateTable(String tableName, Object obj) {
-		if (tableName == ONLINEUSER) {
+		if (tableName == USERINFO) {
+			return updateUSERINFOR((UserInfo) obj);
+		} else if (tableName == ONLINEUSER) {
 			return updateONLINEUSER((OnLineUser) obj);
 		} else if (tableName == ROOMSTATUS) {
 			return updateROOMSTATUS((RoomStatus) obj);
@@ -220,29 +176,6 @@ public class GsonHelper {
 			return false;
 		}
 	}
-
-	// /**
-	// * Update a game's status. This game has been started
-	// *
-	// * @param roomID
-	// * @param new_game_status
-	// * @return
-	// */
-	// public Boolean updateGame(String roomID, RoomStatus new_game_status) {
-	// try {
-	// if (KeyValueAPI.isServerAvailable()) {
-	// String jString = KeyValueAPI.get(TEAMNAME, PASSWORD, roomID);
-	// if (jString.intern() != "") {
-	// jString = gson.toJson(new_game_status);
-	// return Boolean.valueOf(KeyValueAPI.put(TEAMNAME, PASSWORD,
-	// roomID, jString));
-	// }
-	// }
-	// return false;
-	// } catch (Exception ex) {
-	// return false;
-	// }
-	// }
 
 	public Boolean initializeUserGameStatus(String userName, Boolean inGame) {
 		UserGameStatus ugs = new UserGameStatus(userName);
@@ -571,6 +504,28 @@ public class GsonHelper {
 	}
 
 	// ---------------------------- Update Table ------------------------------
+
+	private Boolean updateUSERINFOR(UserInfo new_ui) {
+		Boolean check = false;
+		ArrayList<UserInfo> uial = getUserInfoFromServer();
+		if (uial == null)
+			return false;
+		Iterator<UserInfo> iterator = uial.iterator();
+		UserInfo ui;
+		int count = 0;
+		String userName = new_ui.getUserName().intern();
+		while (iterator.hasNext()) {
+			ui = iterator.next();
+			if (ui.getUserName().intern() == userName) {
+				uial.set(count, new_ui);
+				check = putTableBackToServer(uial, USERINFO);
+				break;
+			}
+			count++;
+		}
+		return check;
+
+	}
 
 	/**
 	 * Update the record in ONLINEUSERTABLE. If there is a record matched the

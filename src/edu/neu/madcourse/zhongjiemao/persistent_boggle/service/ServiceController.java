@@ -14,11 +14,12 @@ public class ServiceController {
 	public static final int SERVICE_FOR_GAMEHALL = 1;
 	public static final int SERVICE_FOR_ROOM = 2;
 	public static final int SERVICE_FOR_GAME = 3;
+	public static final int SERVICE_FOR_BACKGROUND_MUSIC = 4;
 
 	public static final String _SERVICE_FOR_GAMEHALL = "edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGameHall";
 	public static final String _SERVICE_FOR_ROOM = "edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForRoom";
 	public static final String _SERVICE_FOR_GAME = "edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGame";
-
+	public static final String _SERVICE_FOR_BACKGROUND_MUSIC = "edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForBackgroundMusic";
 	private Context context;
 
 	public ServiceController(Context context) {
@@ -36,6 +37,9 @@ public class ServiceController {
 			break;
 		case SERVICE_FOR_GAME:
 			serviceName = _SERVICE_FOR_GAME;
+			break;
+		case SERVICE_FOR_BACKGROUND_MUSIC:
+			serviceName = _SERVICE_FOR_BACKGROUND_MUSIC;
 			break;
 		default:
 			return false;
@@ -109,6 +113,21 @@ public class ServiceController {
 		return false;
 	}
 
+	public Boolean startServiceForBackgroundMusic() {
+		if (!isServiceStarts(_SERVICE_FOR_BACKGROUND_MUSIC)) {
+			try {
+				Intent i = new Intent(context,
+						Class.forName(_SERVICE_FOR_BACKGROUND_MUSIC));
+				context.startService(i);
+				return true;
+			} catch (Exception ex) {
+				System.out.println("Backgroud Music failed");
+				return false;
+			}
+		}
+		return false;
+	}
+
 	private Boolean stopServiceByName(String serviceName) {
 		if (isServiceStarts(serviceName)) {
 			try {
@@ -122,5 +141,4 @@ public class ServiceController {
 		}
 		return false;
 	}
-
 }

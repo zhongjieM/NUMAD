@@ -124,6 +124,11 @@
             android:label="@string/title_activity_persistent_boggle_game"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleHistory"
+            android:label="@string/title_activity_persistent_boggle_history"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <service
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGameHall"
@@ -135,6 +140,10 @@
         </service>
         <service
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGame"
+            android:enabled="true" >
+        </service>
+        <service
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForBackgroundMusic"
             android:enabled="true" >
         </service>
     </application>

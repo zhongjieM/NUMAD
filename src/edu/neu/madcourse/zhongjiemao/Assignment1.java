@@ -25,7 +25,7 @@ public class Assignment1 extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_assignment1);
 
 		// Check whether the phone is permitted to run the program.
-		boolean authorized = true;// = checkAuthorized();
+		boolean authorized = checkAuthorized();
 		// Set click listener for all the buttons.
 		setButtonClickListener(authorized);
 		// System.out.print(authorized);

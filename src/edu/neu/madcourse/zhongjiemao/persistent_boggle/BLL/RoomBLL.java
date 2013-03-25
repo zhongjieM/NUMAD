@@ -45,11 +45,16 @@ public class RoomBLL {
 	 * @param targetUserName
 	 */
 	public void invitation(String targetUserName) {
-		OnLineUser ou = (OnLineUser) gsonHelper.getRecordFromTable(
-				targetUserName, GsonHelper.ONLINEUSER);
-		if (ou != null) {
-			ou.setInviter(roomID);
-			gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+		try {
+			OnLineUser ou = (OnLineUser) gsonHelper.getRecordFromTable(
+					targetUserName, GsonHelper.ONLINEUSER);
+			if (ou != null) {
+				ou.setInviter(roomID);
+				gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return;
 		}
 	}
 
@@ -68,19 +73,24 @@ public class RoomBLL {
 	 * @return TRUE if quit successfully, or false if not.
 	 */
 	public Boolean quitRoom() {
-		Boolean check = false;
-		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
-				GsonHelper.ROOMSTATUS);
-		if (rs != null) {
-			if (rs.getPlayer1().intern() == this.userName.intern()) {
-				check = quitRoomAsMaster(rs);
-			} else {
-				check = quitRoomAsMember(rs);
+		try {
+			Boolean check = false;
+			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+					GsonHelper.ROOMSTATUS);
+			if (rs != null) {
+				if (rs.getPlayer1().intern() == this.userName.intern()) {
+					check = quitRoomAsMaster(rs);
+				} else {
+					check = quitRoomAsMember(rs);
+				}
+				if (check)
+					check = updateONLINEUSERtoNotInGame();
 			}
-			if (check)
-				check = updateONLINEUSERtoNotInGame();
+			return check;
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
 		}
-		return check;
 	}
 
 	/**
@@ -130,22 +140,26 @@ public class RoomBLL {
 	 * @return
 	 */
 	private Boolean quitRoomAsMember(RoomStatus rs) {
-		// you are not the room master
-		if (rs.getPlayer2().intern() == this.userName.intern()) {
-			rs.setPlayer2(RoomStatus.DEFAULT_PLAYER);
-			rs.setNumberOfPlayers(rs.getNumberOfPlayers() - 1);
-		} else if (rs.getPlayer3().intern() == this.userName.intern()) {
-			rs.setPlayer3(RoomStatus.DEFAULT_PLAYER);
-			rs.setNumberOfPlayers(rs.getNumberOfPlayers() - 1);
-		} else {
-			// TODO:
-			// You are not actually in the room.
-			// Quit the room anyway
-			System.out.println("Do nothing here");
+		try {
+			// you are not the room master
+			if (rs.getPlayer2().intern() == this.userName.intern()) {
+				rs.setPlayer2(RoomStatus.DEFAULT_PLAYER);
+				rs.setNumberOfPlayers(rs.getNumberOfPlayers() - 1);
+			} else if (rs.getPlayer3().intern() == this.userName.intern()) {
+				rs.setPlayer3(RoomStatus.DEFAULT_PLAYER);
+				rs.setNumberOfPlayers(rs.getNumberOfPlayers() - 1);
+			} else {
+				// You are not actually in the room.
+				// Quit the room anyway
+				System.out.println("Do nothing here");
+			}
+			System.out.println("Get Player2:" + rs.getPlayer2());
+			System.out.println("Get userName" + this.userName);
+			return gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
 		}
-		System.out.println("Get Player2:" + rs.getPlayer2());
-		System.out.println("Get userName" + this.userName);
-		return gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
 	}
 
 	/**
@@ -154,14 +168,19 @@ public class RoomBLL {
 	 * @return
 	 */
 	public Boolean updateONLINEUSERtoNotInGame() {
-		OnLineUser ou = (OnLineUser) gsonHelper.getRecordFromTable(userName,
-				GsonHelper.ONLINEUSER);
-		if (ou != null) {
-			ou.setInGame(false);
-			ou.setInviter(OnLineUser.DEFAULT_INIVITER);
-			return gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+		try {
+			OnLineUser ou = (OnLineUser) gsonHelper.getRecordFromTable(
+					userName, GsonHelper.ONLINEUSER);
+			if (ou != null) {
+				ou.setInGame(false);
+				ou.setInviter(OnLineUser.DEFAULT_INIVITER);
+				return gsonHelper.updateTable(GsonHelper.ONLINEUSER, ou);
+			}
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -173,30 +192,35 @@ public class RoomBLL {
 	 * @return true if created successfully or false if not.
 	 */
 	public Boolean createNewGame(int mode, String roomID) {
-		// Check other players status
-		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(userName,
-				GsonHelper.ROOMSTATUS);
-		if (rs != null) {
-			String player2 = rs.getPlayer2();
-			String player3 = rs.getPlayer3();
-			UserGameStatus ugs2 = new UserGameStatus();
-			UserGameStatus ugs3 = new UserGameStatus();
-			if (player2.intern() != RoomStatus.DEFAULT_PLAYER)
-				ugs2 = gsonHelper.getUserGameStatus(player2);
-			if (player3.intern() != RoomStatus.DEFAULT_PLAYER)
-				ugs3 = gsonHelper.getUserGameStatus(player3);
-			if (ugs2 == null || ugs3 == null) {
-				System.out.println("ugs2 or ugs3 is null");
+		try {
+			// Check other players status
+			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(
+					userName, GsonHelper.ROOMSTATUS);
+			if (rs != null) {
+				String player2 = rs.getPlayer2();
+				String player3 = rs.getPlayer3();
+				UserGameStatus ugs2 = new UserGameStatus();
+				UserGameStatus ugs3 = new UserGameStatus();
+				if (player2.intern() != RoomStatus.DEFAULT_PLAYER)
+					ugs2 = gsonHelper.getUserGameStatus(player2);
+				if (player3.intern() != RoomStatus.DEFAULT_PLAYER)
+					ugs3 = gsonHelper.getUserGameStatus(player3);
+				if (ugs2 == null || ugs3 == null) {
+					System.out.println("ugs2 or ugs3 is null");
+				}
+				System.out.println(ugs2.getInGame() + " : " + ugs3.getInGame());
+				if ((!ugs2.getInGame()) && (!ugs3.getInGame())) {
+					letters = String.valueOf(generateWords(mode));
+					rs.setCurrentString(letters);
+					rs.setIsGameStarts(true);
+					return gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
+				}
 			}
-			System.out.println(ugs2.getInGame() + " : " + ugs3.getInGame());
-			if ((!ugs2.getInGame()) && (!ugs3.getInGame())) {
-				letters = String.valueOf(generateWords(mode));
-				rs.setCurrentString(letters);
-				rs.setIsGameStarts(true);
-				return gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
-			}
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -206,7 +230,12 @@ public class RoomBLL {
 	 * @return
 	 */
 	public Boolean startGameOperation(String userName) {
-		return gsonHelper.initializeUserGameStatus(userName, true);
+		try {
+			return gsonHelper.initializeUserGameStatus(userName, true);
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
+		}
 	}
 
 	/**
@@ -246,25 +275,32 @@ public class RoomBLL {
 	}
 
 	private Boolean updateUserGameStatus(Boolean roomStatus) {
-		UserGameStatus ugs = gsonHelper.getUserGameStatus(userName);
-		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
-				GsonHelper.ROOMSTATUS);
-		if (ugs != null) {
-			if (ugs.getInGame() == true && rs.getIsGameStarts() == false) {
-				ugs.setInGame(false);
-				gsonHelper.updateUserGameStatus(userName, ugs);
-				System.out.println("Check user status *******: "
-						+ gsonHelper.getUserGameStatus(userName).getInGame());
-				return true;
+		try {
+			UserGameStatus ugs = gsonHelper.getUserGameStatus(userName);
+			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+					GsonHelper.ROOMSTATUS);
+			if (ugs != null) {
+				if (ugs.getInGame() == true && rs.getIsGameStarts() == false) {
+					ugs.setInGame(false);
+					gsonHelper.updateUserGameStatus(userName, ugs);
+					return true;
+				}
 			}
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
 		}
-		return true;
 	}
 
 	public Boolean startable() {
-		// TODO Auto-generated method stub
-		if (gsonHelper.getUserGameStatus(userName).getInGame() == false)
-			return true;
-		return false;
+		try {
+			if (gsonHelper.getUserGameStatus(userName).getInGame() == false)
+				return true;
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+			return false;
+		}
 	}
 }

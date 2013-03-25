@@ -7,8 +7,10 @@ import java.util.Random;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.Score;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.SimpleBloomFilter;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.GsonHelper;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.GameOverResult;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
+import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleGame;
 
 /**
@@ -109,6 +111,12 @@ public class PersistentBoggleBLL {
 		}
 	}
 
+	/**
+	 * Complete exit game operations.
+	 * 
+	 * @param character
+	 * @param userName
+	 */
 	public void exitGame(int character, String userName) {
 		try {
 			if (character == PersistentBoggleGame.ROOMMASTER) {
@@ -118,6 +126,8 @@ public class PersistentBoggleBLL {
 				gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
 			}
 		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleBLL: exitGame failed";
+			System.out.println(errorMessage);
 			System.out.println(ex.toString());
 		}
 	}
@@ -129,24 +139,31 @@ public class PersistentBoggleBLL {
 	 * @return
 	 */
 	public Boolean getPlayersNames(String userName) {
-		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
-				GsonHelper.ROOMSTATUS);
-		if (rs == null)
-			return false;
-		playerID = new String[2];
-		int j = 0;
-		String[] players = new String[3];
-		players[0] = rs.getPlayer1();
-		players[1] = rs.getPlayer2();
-		players[2] = rs.getPlayer3();
-		for (int i = 0; i < 3; i++) {
-			if (players[i].intern() != RoomStatus.DEFAULT_PLAYER
-					&& players[i].intern() != userName.intern()) {
-				playerID[j] = players[i];
-				j++;
+		try {
+			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
+					GsonHelper.ROOMSTATUS);
+			if (rs == null)
+				return false;
+			playerID = new String[2];
+			int j = 0;
+			String[] players = new String[3];
+			players[0] = rs.getPlayer1();
+			players[1] = rs.getPlayer2();
+			players[2] = rs.getPlayer3();
+			for (int i = 0; i < 3; i++) {
+				if (players[i].intern() != RoomStatus.DEFAULT_PLAYER
+						&& players[i].intern() != userName.intern()) {
+					playerID[j] = players[i];
+					j++;
+				}
 			}
+			return true;
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleBLL: getPlayersNames Failed";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+			return false;
 		}
-		return true;
 	}
 
 	/**
@@ -165,7 +182,59 @@ public class PersistentBoggleBLL {
 
 	public void updateWordsToServer(String userName, ArrayList<String> words,
 			int score) {
-		UserGameStatus ugs = new UserGameStatus(userName, true, words, score);
-		gsonHelper.updateUserGameStatus(userName, ugs);
+		try {
+			UserGameStatus ugs = new UserGameStatus(userName, true, words,
+					score);
+			gsonHelper.updateUserGameStatus(userName, ugs);
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleBLL: failed to update words to server";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+		}
+	}
+
+	public GameOverResult formResult(String yourName, int score,
+			UserGameStatus player2, UserGameStatus player3) {
+		GameOverResult gor = new GameOverResult();
+		try {
+			gor.setYourName(yourName);
+			gor.setYourScore(score);
+			if (player2 != null) {
+				gor.setPlayer2Name(player2.getUserName());
+				gor.setPlayer2Score(player2.getCurrentScore());
+			}
+			if (player3 != null) {
+				gor.setPlayer3Name(player3.getUserName());
+				gor.setPlayer3Score(player3.getCurrentScore());
+			}
+			return gor;
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleBLL: formResult Failed";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+			return gor;
+		}
+	}
+
+	/**
+	 * Update to top score of the current player when the game is over
+	 * 
+	 * @param userName
+	 * @param score
+	 */
+	public void updateTopScore(String userName, int score) {
+		try {
+			UserInfo ui = (UserInfo) gsonHelper.getRecordFromTable(userName,
+					GsonHelper.USERINFO);
+			if (ui != null && ui.getTopScore() < score) {
+				ui.setTopScore(score);
+				gsonHelper.updateTable(GsonHelper.USERINFO, ui);
+				System.out.println(String.valueOf(ui.getTopScore()));
+			}
+		} catch (Exception ex) {
+			String errorMessage = "PersistentBoggleBLL: failed to update top score";
+			System.out.println(errorMessage);
+			System.out.println(ex.toString());
+		}
 	}
 }
