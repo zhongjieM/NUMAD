@@ -1,10 +1,13 @@
 package edu.neu.madcourse.zhongjiemao.persistent_boggle.test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.NotificationManager;
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +22,7 @@ import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserInfo;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.GameHallBLL;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGameHall;
 
 public class PersistentBoggleTest extends Activity implements OnClickListener {
@@ -318,13 +322,25 @@ public class PersistentBoggleTest extends Activity implements OnClickListener {
 	}
 
 	private void NOTIFICATIONTEST() {
-		System.out.println("Pressed");
-		Intent i = new Intent(this, ServiceForGameHall.class);
-		getApplicationContext().startService(i);
+		ServiceController sc = new ServiceController(this);
+		if (sc.startServiceForGameHall("kevin")) {
+			Toast.makeText(this, "Start service successfully",
+					Toast.LENGTH_SHORT).show();
+		} else
+			Toast.makeText(this, "Fail to start service", Toast.LENGTH_SHORT)
+					.show();
 	}
 
 	private void NOTIFICATIONTESTCANCEL() {
-		getApplicationContext().stopService(
-				new Intent(this, ServiceForGameHall.class));
+		// This part is to check whether the service starts; if it is starts
+		// then it can be stopped;
+		ServiceController sc = new ServiceController(this);
+		if (sc.stopServiceById(ServiceController.SERVICE_FOR_GAMEHALL)) {
+			Toast.makeText(this, "Stop service successfully",
+					Toast.LENGTH_SHORT).show();
+		} else
+			Toast.makeText(this, "fail to stop service", Toast.LENGTH_SHORT)
+					.show();
+
 	}
 }

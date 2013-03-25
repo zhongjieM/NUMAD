@@ -250,9 +250,6 @@ public class RoomBLL {
 		RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
 				GsonHelper.ROOMSTATUS);
 		if (ugs != null) {
-			System.out.println("Trying to update user status: "
-					+ ugs.toString());
-			System.out.println("Check room Status: " + rs.getIsGameStarts());
 			if (ugs.getInGame() == true && rs.getIsGameStarts() == false) {
 				ugs.setInGame(false);
 				gsonHelper.updateUserGameStatus(userName, ugs);

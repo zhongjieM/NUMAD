@@ -23,12 +23,14 @@ import edu.neu.madcourse.zhongjiemao.persistent_boggle.InvitationDialog;
 public class ServiceForGameHall extends Service {
 
 	private static final String TAG = "ServiceForGameHall";
-
+	public static final String INTENT_USERNAME = "INTENT_USERNAME";
+	private String inviter = "";
 	private Timer timer;
 	private TimerTask listenerForInvitation;
 	private static Handler handler;
 	private GsonHelper gsonHelper;
-	private NotificationManager notificationManager;
+
+	private String userName;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -41,18 +43,28 @@ public class ServiceForGameHall extends Service {
 		Log.d(TAG, "Service will be destroryed");
 		listenerForInvitation.cancel();
 		timer.cancel();
-		if (notificationManager != null)
-			notificationManager.cancel(1);
+		new NotificationBarController(getApplicationContext())
+				.cancelNotification(NotificationBarController.NOTIFICATION_ID_GAMEHALL);
 		super.onDestroy();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startID) {
 		Log.d(TAG, "Start Service by onStartCommand");
+		try {
+			this.userName = intent.getStringExtra(INTENT_USERNAME);
+		} catch (Exception ex) {
+			String errorMessage = "ServiceForGameHall can't get userName";
+			System.out.println(errorMessage);
+		}
 		initialization();
 		return Service.START_STICKY;
 	}
 
+	/**
+	 * Start a thread to check the ONLINEUSER table to find whether there is an
+	 * invitation for this user
+	 */
 	private void initialization() {
 
 		gsonHelper = new GsonHelper();
@@ -74,16 +86,23 @@ public class ServiceForGameHall extends Service {
 			@Override
 			public void run() {
 				System.out.println("Timer ticked");
-				OnLineUser olu = (OnLineUser) gsonHelper.getRecordFromTable(
-						"kevin", GsonHelper.ONLINEUSER);
-				if (olu != null) {
-					if (olu.getInviter().intern() != OnLineUser.DEFAULT_INIVITER) {
-						olu.setInviter(OnLineUser.DEFAULT_INIVITER);
-						gsonHelper.updateTable(GsonHelper.ONLINEUSER, olu);
-						Message msg = new Message();
-						msg.what = 1;
-						handler.sendMessage(msg);
+				try {
+					OnLineUser olu = (OnLineUser) gsonHelper
+							.getRecordFromTable(userName, GsonHelper.ONLINEUSER);
+					if (olu != null) {
+						inviter = olu.getInviter();
+						if (inviter.intern() != OnLineUser.DEFAULT_INIVITER) {
+							olu.setInviter(OnLineUser.DEFAULT_INIVITER);
+							gsonHelper.updateTable(GsonHelper.ONLINEUSER, olu);
+							Message msg = new Message();
+							msg.what = 1;
+							handler.sendMessage(msg);
+						}
 					}
+				} catch (Exception ex) {
+					String errorMessage = "Game Hall Service: initialization: TimerTask Failed";
+					System.out.println(errorMessage);
+					return;
 				}
 			}
 
@@ -95,16 +114,8 @@ public class ServiceForGameHall extends Service {
 
 	@SuppressWarnings({ "deprecation", "deprecation", "deprecation" })
 	private void showNotificationBar() {
-		System.out.println("You got an invitaion");
-		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		@SuppressWarnings({ "deprecation", "deprecation" })
-		Notification notification = new Notification(R.drawable.even_icon,
-				"You have an invitation", System.currentTimeMillis());
-		notification.defaults = Notification.DEFAULT_ALL;
-		Intent i = new Intent(this, GameHall.class);
-		i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		PendingIntent pt = PendingIntent.getActivity(this, 1, i, 0);
-		notification.setLatestEventInfo(this, " title", "content", pt);
-		notificationManager.notify(1, notification);
+		NotificationBarController nbc = new NotificationBarController(this);
+		nbc.showNotificationBar(
+				NotificationBarController.NOTIFICATION_ID_GAMEHALL, inviter);
 	}
 }

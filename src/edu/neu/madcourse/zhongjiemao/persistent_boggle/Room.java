@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.RoomBLL;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
 
 /**
  * This class is to the Room Activity. There are two characters in this room:
@@ -89,6 +89,10 @@ public class Room extends Activity implements OnClickListener {
 
 	private Boolean backButtonEnabled = true;
 
+	// service part
+	private static Boolean isHomeNotPressed = false;
+	private ServiceController serviceController;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -107,6 +111,7 @@ public class Room extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View arg0) {
 		// TODO:
+		isHomeNotPressed = true;
 		switch (arg0.getId()) {
 		case BUTTON_STARTID:
 			openNewGameDialog();
@@ -124,17 +129,23 @@ public class Room extends Activity implements OnClickListener {
 	}
 
 	@Override
-	public void onStart() {
-		// TODO:
-		startThreadListener();
-		super.onStart();
+	public void onPause() {
+		if (!isHomeNotPressed) {
+			String[] params = { roomID, userName };
+			serviceController = new ServiceController(this);
+			serviceController.startServiceForRoom(params);
+		} else
+			isHomeNotPressed = false;
+		timer.cancel();
+		super.onStop();
 	}
 
 	@Override
-	public void onStop() {
-		// TODO:
-		timer.cancel();
-		super.onStop();
+	public void onResume() {
+		serviceController = new ServiceController(this);
+		serviceController.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
+		startThreadListener();
+		super.onStart();
 	}
 
 	@Override
@@ -380,6 +391,7 @@ public class Room extends Activity implements OnClickListener {
 			int character) {
 		timer.cancel();
 		if (roomBLL.startGameOperation(userName)) {
+			isHomeNotPressed = true;
 			Intent in = new Intent(getApplicationContext(),
 					PersistentBoggleGame.class);
 			in.putExtra(Room.INTENT_USERNAME, this.userName);
@@ -394,6 +406,7 @@ public class Room extends Activity implements OnClickListener {
 	}
 
 	private void startGameAsMember() {
+		serviceController.stopServiceById(ServiceController.SERVICE_FOR_ROOM);
 		if (!roomBLL.startable())
 			return;
 		String letters = roomBLL.getLettersFromServer(roomID);
@@ -408,6 +421,7 @@ public class Room extends Activity implements OnClickListener {
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
+			isHomeNotPressed = true;
 			return roomBLL.quitRoom();
 		}
 

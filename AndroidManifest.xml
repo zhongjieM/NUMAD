@@ -111,7 +111,8 @@
         </activity>
         <activity
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.Room"
-            android:label="@string/title_activity_room" >
+            android:label="@string/title_activity_room"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.InvitationDialog"
@@ -126,6 +127,14 @@
 
         <service
             android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGameHall"
+            android:enabled="true" >
+        </service>
+        <service
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForRoom"
+            android:enabled="true" >
+        </service>
+        <service
+            android:name="edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceForGame"
             android:enabled="true" >
         </service>
     </application>

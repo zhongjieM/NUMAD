@@ -3,7 +3,6 @@ package edu.neu.madcourse.zhongjiemao.persistent_boggle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,6 +29,7 @@ import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.Score;
 import edu.neu.madcourse.zhongjiemao.boggle.BLLDAL.SoundEffect;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.UserGameStatus;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.PersistentBoggleBLL;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
 import edu.neu.madcourse.zhongjiemao.sudoku.Music;
 
 /**
@@ -103,6 +103,7 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 
 	// The following variables are used for time count down
 	private Timer timer;
+	private TimerTask tick_task;
 	private RelativeLayout layout_timer;
 	// Handler: used for send message from timer thread to UI thread;
 	private Handler handler;
@@ -132,6 +133,9 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	private Timer networkTasksTimer;
 	private static Handler networkTasksHandler;
 	private TimerTask timertask_NetworkTasks_UpdatePlayers;
+
+	// Service part
+	private ServiceController serviceController;
 
 	// -------------------------------------------------------------------------
 	// ------------------------Override Methods Part----------------------------
@@ -166,25 +170,46 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 	@Override
 	// automatically called when the activity resume from pause
 	protected void onResume() {
-		super.onResume();
-		initializeNetworkListener();
+		Log.d(TAG, "OnResume Called");
+		try {
+			serviceController = new ServiceController(this);
+			if (serviceController
+					.isServiceStarts(ServiceController._SERVICE_FOR_GAME)) {
+				serviceController
+						.stopServiceById(ServiceController.SERVICE_FOR_GAME);
+				recLen = getSharedPreferences("GAME_TIME_CURRENT", MODE_PRIVATE)
+						.getInt("TIME_CURRENT", 180);
+			}
+			initializeNetworkListener();
+			timer();
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
+		}
 		Music.play(this, R.raw.bogglegaming);
+		super.onResume();
 	}
 
 	@Override
 	// automatically called when the activity paused
 	protected void onPause() {
-		super.onPause();
 		Log.d(TAG, "onPause");
+		timer.cancel();
 		if (!isBackExitPressed) {
 			saveData();
-		} else {
 			// TODO: HOME button or Power button clicked,
 			// Start a service to continue the job.
+			serviceController = new ServiceController(this);
+			String[] params = { roomID, userName, String.valueOf(character),
+					String.valueOf(recLen) };
+			serviceController.startServiceForGame(params);
+		} else {
 			System.out.println("Back or Exit Button pressed");
+
 			isBackExitPressed = false;
 		}
 		Music.stop(this);
+		super.onPause();
+
 	}
 
 	// -------------------------------------------------------------------------
@@ -293,8 +318,8 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 			existed_word.append(iterator.next() + "#");
 
 		// save userName
-		getPreferences(MODE_PRIVATE).edit().putString(Room.INTENT_USERNAME,
-				this.userName);
+		getPreferences(MODE_PRIVATE).edit()
+				.putString(Room.INTENT_USERNAME, this.userName).commit();
 		// save character
 		getPreferences(MODE_PRIVATE).edit()
 				.putInt(PersistentBoggleGame.CHARACTER, character).commit();
@@ -319,10 +344,6 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		getPreferences(MODE_PRIVATE).edit()
 				.putInt(PersistentBoggleGame.SCORE, this.score.getScore())
 				.commit();
-		// TODO:
-		// no need to store time, its an online game
-		getPreferences(MODE_PRIVATE).edit()
-				.putInt(PersistentBoggleGame.TIMER, this.recLen).commit();
 	}
 
 	/**
@@ -357,10 +378,6 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		int s = getPreferences(MODE_PRIVATE).getInt(PersistentBoggleGame.SCORE,
 				0);
 		this.score = new Score(s);
-		// reload timer
-		// TODO: no need to reload timer
-		recLen = getPreferences(MODE_PRIVATE).getInt(
-				PersistentBoggleGame.TIMER, GAMETIME);
 		// reload letters
 		letters = new char[mode * mode];
 		String l = getPreferences(MODE_PRIVATE).getString(
@@ -385,7 +402,11 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 			this.letters = bbll.generateWords(mode);
 		this.existed_words = new LinkedHashSet<String>();
 		this.score = new Score(0);
-		this.recLen = GAMETIME;
+		this.recLen = getSharedPreferences("GAME_TIME", MODE_PRIVATE).getInt(
+				"TIME", GAMETIME);
+		// TODO: need to refresh it
+		getSharedPreferences("GAME_TIME", MODE_PRIVATE).edit()
+				.putInt("TIME", GAMETIME).commit();
 	}
 
 	/**
@@ -459,7 +480,6 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		RelativeLayout.LayoutParams txt_timer_rllp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		timer();
 		txt_timer_rllp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 		layout_timer.addView(txt_Timer, txt_timer_rllp);
 		rly.addView(layout_timer, ltlp);
@@ -480,7 +500,6 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 		RelativeLayout.LayoutParams rlewlp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT,
 				RelativeLayout.LayoutParams.WRAP_CONTENT);
-		// rlewlp.addRule(RelativeLayout.LEFT_OF, wordGridView.getId());
 		rlewlp.addRule(RelativeLayout.BELOW, layout_timer.getId());
 
 		for (int i = 0; i < 3; i++) {
@@ -598,7 +617,7 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 			}
 		};
 
-		TimerTask task = new TimerTask() {
+		tick_task = new TimerTask() {
 			public void run() {
 				Message message = new Message();
 				message.what = 1;
@@ -612,7 +631,7 @@ public class PersistentBoggleGame extends Activity implements OnClickListener {
 			}
 		};
 		timer = new Timer(true);
-		timer.schedule(task, 1000, 1000);
+		timer.schedule(tick_task, 1000, 1000);
 	}
 
 	private void initializeNetworkListener() {

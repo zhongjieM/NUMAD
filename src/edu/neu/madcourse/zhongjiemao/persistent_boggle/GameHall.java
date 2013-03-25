@@ -21,7 +21,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,10 +33,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.neu.madcourse.zhongjiemao.R;
-import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.OnLineUser;
 import edu.neu.madcourse.zhongjiemao.gsonhelper.entities.RoomStatus;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.BLL.GameHallBLL;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.arrayadapter.RoomStatusAdapter;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.service.ServiceController;
 
 /**
  * This is the game hall activity. Player who enters this room will have a
@@ -83,9 +82,7 @@ public class GameHall extends Activity implements OnClickListener {
 	//
 	private int screenWidth = 0;
 	private int screenHeight = 0;
-
-	private LayoutInflater li;
-	private RelativeLayout rly;
+	private static Boolean isHomeNotPressed = false;
 
 	private TextView tv_roomName;
 	private TextView tv_numberOfPlayers;
@@ -106,6 +103,9 @@ public class GameHall extends Activity implements OnClickListener {
 	private Timer timer;
 	private String invitation = "";
 	private Boolean backButtonEnabled = true;
+
+	// Service Part
+	private ServiceController serviceController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -157,19 +157,25 @@ public class GameHall extends Activity implements OnClickListener {
 	}
 
 	@Override
-	public void onStart() {
-		// When activity starts or goes back, starts threads;
-		startThreadListerner();
-		setViewEnabled(true);
-		super.onStart();
+	public void onPause() {
+		if (!isHomeNotPressed) {
+			serviceController = new ServiceController(this);
+			serviceController.startServiceForGameHall(userName);
+		} else
+			isHomeNotPressed = false;
+		timer.cancel();
+		super.onPause();
+
 	}
 
 	@Override
-	public void onStop() {
-		// When press BACK button, HOME button, Quit button or LOCK button, the
-		// activity will go out, so all the thread will be canceled;
-		timer.cancel();
-		super.onStop();
+	public void onResume() {
+		serviceController = new ServiceController(this);
+		serviceController
+				.stopServiceById(ServiceController.SERVICE_FOR_GAMEHALL);
+		startThreadListerner();
+		setViewEnabled(true);
+		super.onResume();
 	}
 
 	// -------------------- private methods -----------------------------------
@@ -452,6 +458,7 @@ public class GameHall extends Activity implements OnClickListener {
 
 		@Override
 		protected Boolean doInBackground(String... arg0) {
+			isHomeNotPressed = true;
 			userName = arg0[0];
 			return gameHallBLL.startANewRoom();
 		}
@@ -479,6 +486,7 @@ public class GameHall extends Activity implements OnClickListener {
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
+			isHomeNotPressed = true;
 			return gameHallBLL.quitGameHall();
 		}
 

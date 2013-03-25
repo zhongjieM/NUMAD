@@ -110,11 +110,15 @@ public class PersistentBoggleBLL {
 	}
 
 	public void exitGame(int character, String userName) {
-		if (character == PersistentBoggleGame.ROOMMASTER) {
-			RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(roomID,
-					GsonHelper.ROOMSTATUS);
-			rs.setIsGameStarts(false);
-			gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
+		try {
+			if (character == PersistentBoggleGame.ROOMMASTER) {
+				RoomStatus rs = (RoomStatus) gsonHelper.getRecordFromTable(
+						roomID, GsonHelper.ROOMSTATUS);
+				rs.setIsGameStarts(false);
+				gsonHelper.updateTable(GsonHelper.ROOMSTATUS, rs);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.toString());
 		}
 	}
 
