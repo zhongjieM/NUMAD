@@ -20,7 +20,7 @@
     <string name="img_description_activity_team_member">	    This is the image of the designer of this app.</string>
 
     <!-- This part is copied from Sudoku Game. -->
-
+    <string name="final_app_name">MAD-ExerPacman</string>
     <string name="main_title">Android Sudoku</string>
     <string name="continue_label">Continue</string>
     <string name="new_game_label">New Game</string>
@@ -62,22 +62,97 @@ row, each column, and each of the 3x3 boxes
         Background Image - \nhttp://www.freegreatpicture.com\n\n
         Boggle Image - \nhttp://api.list.ly/</string>
     <string name="title_activity_boggle_about">About</string>
-    <string name="content_boggle_about">         Boggle is a word game. Starting with a grid
-         of 4*4 randomly determinded letters, the
-         objective is to find as many 3 or more
-         character words within the grid which are
-         directly adjacent by edge or corner within
-         the time limit of 3 minutes. One point is
-         awarded for 3 or 4 letter words. Two points
-         for 5 letter words. Three points for 6 letter
-         words. Five points for 7 letter words. Eight
-         points for words 8 character or longer.</string>
-    <string name="title_activity_persistent_boggle_login">PersistentBoggleLogin</string>
-    <string name="title_activity_game_hall">GameHall</string>
-    <string name="title_activity_persistent_boggle_test">PersistentBoggleTest</string>
+    <string name="content_boggle_about">        Persistent Boggle can support two or three\n
+        players to play in a room at the same time.\n
+        You need to register for yourself. The user\n
+        name should be more than 5 letters.\n
+        Then you enter the game hall. Here\n
+        you can create a room for yourself or\n
+        choose a room that is already opened up\n
+        by others or waiting for others to invite\n
+        you. Once you create a room you can start\n
+        a game or invite more players to your room\n
+        If you pressed HOME button or just leave\n
+        the game service for each activity will\n
+        starts to listen to the network and
+        reminds you what is going on by notification.\n
+        When you start a game, you can choose to\n
+        play the game in 4*4 or 5*5 or 6*6 board.\n
+        During a game, if there are other players\n
+        play with you you will see what new\n
+        letters they have chosen and their new score.\n</string>
+    <string name="title_activity_persistent_boggle_login">Persistent Boggle Login</string>
+    <string name="title_activity_game_hall">Game Hall</string>
+    <string name="title_activity_persistent_boggle_test">Persistent Boggle Test</string>
     <string name="title_activity_room">Room</string>
-    <string name="title_activity_invitation_dialog">InvitationDialog</string>
+    <string name="title_activity_invitation_dialog">Invitation Dialog</string>
     <string name="title_activity_persistent_boggle_game">Persistent Boggle</string>
-    <string name="title_activity_persistent_boggle_history">PersistentBoggleHistory</string>
+    <string name="title_activity_persistent_boggle_history">Persistent Boggle History</string>
+    <!-- Exer_pacman -->
+
+    <string name="exer_pacman_trickest_part_label">Trickest Part.</string>
+    <string name="exer_pacman_final_project_label">Final Project</string>
+    <string name="exer_pacman_label">Exer Pacman</string>
+    <string name="exer_pacman_start_label">Start Exer Pacman</string>
+    <string name="exer_pacman_settings_title">Exer Pacman Settings</string>
+    <string name="exer_pacman_settings_label">Settings...</string>
+    <string name="exer_pacman_map_nav_label">Select a Maze</string>
+    <string name="exer_pacman_settings_shortcut">s</string>
+    <string name="exer_pacman_sh_title">General</string>
+    <string name="exer_pacman_music_title">Music</string>
+    <string name="exer_pacman_music_summary">Play background music</string>
+    <string name="exer_pacman_hints_title">Hints (Sensor Mode Only)</string>
+    <string name="exer_pacman_hints_summary">Show hints of rotation direction during game play</string>
+    <string name="exer_pacman_game_mode_title">Pac-Man Controller Mode</string>
+    <string name="exer_pacman_game_mode_summary">Select your favorite game mode</string>
+    <string name="exer_pacman_squat_title">Squatting Enabled</string>
+    <string name="exer_pacman_squat_summary">You can disable squatting to play classic version of Ms Pac-Man</string>
+    <string name="exer_pacman_sensor_mode">Sensor Mode</string>
+    <string name="exer_pacman_swipe_mode">Swipe Mode</string>
+    <string name="exer_pacman_game_pace_cat">Game Pace</string>
+    <string name="exer_pacman_game_pace_title">Adjust Preferred Game Pace</string>
+    <string name="exer_pacman_game_pace_summary">55 is the recommended pace for both\nmodes, for sensor mode, we highly\nrecemmend that you ajdust to a lower\npace for better rotation</string>
+    <string name="exer_pacman_ghost_agressivity_cat">Ghosts Aggressivity</string>
+    <string name="exer_pacman_ghost_agressivity_title">Adjust Ghosts Aggressivity</string>
+    <string name="exer_pacman_ghost_agressivity_summary"></string>
+    <string name="exer_pacman_training_plan">Training Plan - Number of beans in each level</string>
+    <string name="exer_pacman_lv1_beans">Level 1</string>
+    <string name="exer_pacman_lv1_summary">Set how many times you want to squat in level 1</string>
+    <string name="exer_pacman_lv2_beans">Level 2</string>
+    <string name="exer_pacman_lv2_summary">Set how many times you want to squat in level 2</string>
+    <string name="exer_pacman_lv3_beans">Level 3</string>
+    <string name="exer_pacman_lv3_summary">Set how many times you want to squat in level 3</string>
+    <string name="exer_pacman_lv4_beans">Level 4</string>
+    <string name="exer_pacman_lv4_summary">Set how many times you want to squat in level 4</string>
+    <string name="exer_pacman_lv_1">Level 1</string>
+    <string name="exer_pacman_lv_2">Level 2</string>
+    <string name="exer_pacman_lv_3">Level 3</string>
+    <string name="exer_pacman_lv_4">Level 4</string>
+    <string name="exer_pacman_pause_resume">Resume</string>
+    <string name="exer_pacman_pause_restart">Restart</string>
+    <string name="exer_pacman_pause_quit">Quit</string>
+    <string name="exer_pacman_time_label">Time: </string>
+    <string name="exer_pacman_score_label">Score: </string>
+    <string name="exer_pacman_left_arrow">Turn Left</string>
+    <string name="exer_pacman_right_arrow">Turn Right</string>
+    <string name="exer_pacman_hp_label">HP: 50/50</string>
+    <string name="exer_pacman_tutorial_pages">Tutorial Pages</string>
+    <string name="exer_pacman_top_score_list_label">History Ranks</string>
+    <string name="exer_pacman_ack_title">Acknowledgement</string>
+    <string name="exer_pacman_ack_dev_title">Developers</string>
+    <string name="exer_pacman_ack_dev_1">Yingquan Yuan</string>
+    <string name="exer_pacman_ack_dev_2">Zhongjie Mao</string>
+    <string name="exer_pacman_ack_alg_title">Algorithms</string>
+    <string name="exer_pacman_ack_alg_content">Shortest Path: A Star (Ghosts)</string>
+    <string name="exer_pacman_ack_img_title">Images Suite</string>
+    <string name="exer_pacman_ack_img_content">Ms Pac-Man vs Ghosts League</string>
+    <string name="exer_pacman_ack_sound_title">Sounds</string>
+    <string name="exer_pacman_ack_sound_content">playonloop.com</string>
+    <string name="exer_pacman_description">Play Store Description</string>
+    <string name="exer_pacman_description_text">\<pre>            This is a young and energetic Pacman, not that old guy. Pacman still eats fruit, but it needs you 
+            to do some squatting exercise. Besides, Pacman becomes more intelligent, because it could feel your 
+            rotation and which direction you are turning to, and it can even do that follow you. Now, pilot your 
+            own pacman, eat some fruits, defeat the ghosts, and in the same time, do some exercise on your knees 
+            and waist.</pre></string>
 
 </resources>

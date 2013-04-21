@@ -9,14 +9,37 @@
 -->
 <!-- This file is coppied from Sudoku Game. -->
 <resources>
-   <array name="difficulty">
-      <item>@string/easy_label</item>
-      <item>@string/medium_label</item>
-      <item>@string/hard_label</item>
-   </array>
-   <array name="board">
-       <item>"4*4"</item>
-       <item>"5*5"</item>
-       <item>"6*6"</item>
-   </array>
+
+    <array name="difficulty">
+        <item>@string/easy_label</item>
+        <item>@string/medium_label</item>
+        <item>@string/hard_label</item>
+    </array>
+    <array name="board">
+        <item>"4*4"</item>
+        <item>"5*5"</item>
+        <item>"6*6"</item>
+    </array>
+    <!-- Exer_pacman -->
+    <array name="exer_pacman_levels">
+        <item>@string/exer_pacman_lv_1</item>
+        <item>@string/exer_pacman_lv_2</item>
+        <item>@string/exer_pacman_lv_3</item>
+    </array>
+
+    <string-array name="exer_pacman_game_mode">
+        <item>@string/exer_pacman_sensor_mode</item>
+        <item>@string/exer_pacman_swipe_mode</item>
+    </string-array>
+    <string-array name="exer_pacman_game_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <array name="exer_pacman_pause">
+        <item>@string/exer_pacman_pause_resume</item>
+        <item>@string/exer_pacman_pause_restart</item>
+        <item>@string/exer_pacman_pause_quit</item>
+    </array>
+
 </resources>

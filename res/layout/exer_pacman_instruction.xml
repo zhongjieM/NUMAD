@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_texture"
+    android:padding="10dip" >
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/exer_pacman_red"
+	    android:paddingTop="40dip"
+        android:text="@string/exer_pacman_description"
+        android:background="@android:color/transparent" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:typeface="serif"
+        android:textColor="@android:color/white"
+        android:paddingTop="20dip"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:text="@string/exer_pacman_description_text"
+        android:background="@android:color/transparent" />
+    
+    <Button
+        android:id="@+id/exer_pacman_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_weight="0"
+        android:text="@string/exer_pacman_start_label" />
+    
+</LinearLayout>

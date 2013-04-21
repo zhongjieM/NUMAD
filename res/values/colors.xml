@@ -5,7 +5,7 @@
  ! Copyrights apply to this code. It may not be used to create training material, 
  ! courses, books, articles, and the like. Contact us if you are in doubt.
  ! We make no guarantees that this code is fit for any purpose. 
- ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
+ ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
 -->
 <!-- This file is coppied from Sudoku Game. -->
 <resources>
@@ -31,5 +31,9 @@
     <color name="boggle_word_color5">#ff00EE00</color>
     <color name="boggle_word_color6">#ff00FF00</color>
     <color name="persistent_boggle_edit_text">#40000000</color>
+
+    <!-- Exer_pacman -->
+    <color name="exer_pacman_green">#ff00ff80</color>
+    <color name="exer_pacman_red">#ffff0000</color>
 
 </resources>

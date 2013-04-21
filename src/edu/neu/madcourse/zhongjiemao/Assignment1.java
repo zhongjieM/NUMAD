@@ -1,21 +1,18 @@
 package edu.neu.madcourse.zhongjiemao;
 
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-
-import edu.neu.madcourse.zhongjiemao.boggle.BoggleGame;
-import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
-import edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleLogin;
-import edu.neu.madcourse.zhongjiemao.sudoku.*;
-import edu.neu.mobileClass.PhoneCheckAPI;
-import android.net.Uri;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.util.DisplayMetrics;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.content.Intent;
 import android.view.View.OnClickListener;
+import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
+import edu.neu.madcourse.zhongjiemao.exerpacman.activities.ExerPacmanInstruction;
+import edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleLogin;
+import edu.neu.madcourse.zhongjiemao.sudoku.Sudoku;
+import edu.neu.mobileClass.PhoneCheckAPI;
 
 public class Assignment1 extends Activity implements OnClickListener {
 
@@ -98,6 +95,9 @@ public class Assignment1 extends Activity implements OnClickListener {
 		View btn_boggle = findViewById(R.id.btn_boggle_game);
 		btn_boggle.setOnClickListener(this);
 
+		View btn_final = findViewById(R.id.btn_final);
+		btn_final.setOnClickListener(this);
+
 		View btn_error_check = findViewById(R.id.btn_error);
 		btn_error_check.setOnClickListener(this);
 
@@ -145,6 +145,9 @@ public class Assignment1 extends Activity implements OnClickListener {
 		case R.id.btn_boggle_game:
 			i = new Intent(this, BoggleMain.class);
 			startActivity(i);
+			break;
+		case R.id.btn_final:
+			startActivity(new Intent(this, ExerPacmanInstruction.class));
 			break;
 		case R.id.btn_exit:
 			System.exit(0);

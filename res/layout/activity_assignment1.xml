@@ -10,53 +10,53 @@
     android:padding="30dip"
     tools:context=".Assignment1" >
 
-    <Button
-        android:id="@+id/btn_team_members"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_sudoku_game"
-        android:layout_centerHorizontal="true"
-        android:text="@string/btn_team_member_activity_assignment1" />
+        android:layout_gravity="center"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/btn_sudoku_game"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_boggle_game"
-        android:layout_alignLeft="@+id/btn_team_members"
-        android:text="@string/btn_sudoku_activity_assignment1" />
+        <Button
+            android:id="@+id/btn_team_members"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_team_member_activity_assignment1" />
 
-    <Button
-        android:id="@+id/btn_boggle_game"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_persistent_boggle"
-        android:layout_alignLeft="@+id/btn_sudoku_game"
-        android:text="@string/btn_boggle_game" />
+        <Button
+            android:id="@+id/btn_sudoku_game"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_sudoku_activity_assignment1" />
 
-    <Button
-        android:id="@+id/btn_persistent_boggle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_error"
-        android:layout_alignLeft="@+id/btn_error"
-        android:text="@string/btn_persistent_boggle" />
+        <Button
+            android:id="@+id/btn_boggle_game"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_boggle_game" />
 
-    <Button
-        android:id="@+id/btn_error"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_exit"
-        android:layout_alignLeft="@+id/btn_boggle_game"
-        android:text="@string/btn_error_check_activity_assignment1" />
+        <Button
+            android:id="@+id/btn_persistent_boggle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_persistent_boggle" />
 
-    <Button
-        android:id="@+id/btn_exit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btn_error"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="18dp"
-        android:text="@string/btn_exit_activity_assignment1" />
+        <Button
+            android:id="@+id/btn_final"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Final Project" />
+
+        <Button
+            android:id="@+id/btn_error"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_error_check_activity_assignment1" />
+
+        <Button
+            android:id="@+id/btn_exit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_exit_activity_assignment1" />
+    </LinearLayout>
 
 </RelativeLayout>

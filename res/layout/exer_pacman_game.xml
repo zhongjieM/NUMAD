@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/exer_pacman_game_base_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_texture" >
+    
+    <TextView
+        android:id="@+id/exer_pacman_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:paddingTop="15dip"
+        android:paddingLeft="20dip"
+        android:text="@string/exer_pacman_time_label" />
+    
+    <ImageView
+        android:id="@+id/exer_pacman_left_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:paddingTop="47dip"
+        android:paddingLeft="70dip"
+        android:contentDescription="@string/exer_pacman_left_arrow" />
+    
+    <TextView
+        android:id="@+id/exer_pacman_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:paddingTop="15dip"
+        android:paddingRight="20dip"
+        android:text="@string/exer_pacman_score_label" />
+    
+    <ImageView
+        android:id="@+id/exer_pacman_right_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:paddingTop="47dip"
+        android:paddingRight="70dip"
+        android:contentDescription="@string/exer_pacman_right_arrow" />
+    
+    <edu.neu.madcourse.zhongjiemao.exerpacman.views.GameView
+        android:id="@+id/exer_pacman_game_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center" />
+    
+    <TextView
+        android:id="@+id/exer_pacman_hp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:paddingLeft="20dip"
+        android:paddingBottom="42dip"
+        android:text="@string/exer_pacman_hp_label" />
+    
+    <ProgressBar
+        android:id="@+id/exer_pacman_hp_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:max="50"
+        android:progress="50"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progressDrawable="@drawable/hp_bar"
+        android:paddingLeft="20dip"
+        android:paddingBottom="20dip" />
+    
+    <edu.neu.madcourse.zhongjiemao.exerpacman.views.OrientationView
+        android:id="@+id/exer_pacman_orientation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right" />
+    
+</FrameLayout>

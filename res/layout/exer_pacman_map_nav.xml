@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_texture" >
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:paddingTop="20dip"
+        android:text="@string/exer_pacman_map_nav_label"
+        android:background="@android:color/transparent" />
+    
+    <ListView
+        android:id="@+id/exer_pacman_lv_map_nav"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingTop="30dip"
+        android:paddingBottom="30dip"
+        android:paddingLeft="15dip"
+        android:paddingRight="15dip"
+        android:background="@android:color/transparent" >
+    </ListView>
+    
+</LinearLayout>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:exerpacman="http://exerpacman.yingquanyuan.madcourse.neu.edu" >
+
+    <PreferenceCategory
+        android:title="@string/exer_pacman_sh_title" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="exer_pacman_key_music"
+            android:summary="@string/exer_pacman_music_summary"
+            android:title="@string/exer_pacman_music_title" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="exer_pacman_key_hints"
+            android:summary="@string/exer_pacman_hints_summary"
+            android:title="@string/exer_pacman_hints_title" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="exer_pacman_key_squat"
+            android:summary="@string/exer_pacman_squat_summary"
+            android:title="@string/exer_pacman_squat_title" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="@string/exer_pacman_game_pace_cat" >
+        <edu.neu.madcourse.zhongjiemao.exerpacman.views.SeekBarPreference
+            android:defaultValue="55"
+            android:max="80"
+            android:key="exer_pacman_key_game_pace"
+            android:title="@string/exer_pacman_game_pace_title"
+            android:summary="@string/exer_pacman_game_pace_summary"
+            exerpacman:min="20" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="@string/exer_pacman_ghost_agressivity_cat" >
+        <edu.neu.madcourse.zhongjiemao.exerpacman.views.SeekBarPreference
+            android:defaultValue="5"
+            android:max="100"
+            android:key="exer_pacman_key_ghost_agressivity"
+            android:title="@string/exer_pacman_ghost_agressivity_title"
+            android:summary="@string/exer_pacman_game_pace_summary"
+            exerpacman:min="0" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="@string/exer_pacman_training_plan" >
+        <EditTextPreference
+            android:key="exer_pacman_squat_lv1"
+            android:defaultValue="15"
+            android:title="@string/exer_pacman_lv1_beans"
+            android:summary="@string/exer_pacman_lv1_summary"
+            android:inputType="number"
+            android:maxLength="2"
+            android:icon="@drawable/maze_a"
+            android:dialogIcon="@drawable/icon_lv1" />
+        <EditTextPreference
+            android:key="exer_pacman_squat_lv2"
+            android:defaultValue="25"
+            android:title="@string/exer_pacman_lv2_beans"
+            android:summary="@string/exer_pacman_lv2_summary"
+            android:inputType="number"
+            android:maxLength="2"
+            android:icon="@drawable/maze_b"
+            android:dialogIcon="@drawable/icon_lv2" />
+        <EditTextPreference
+            android:key="exer_pacman_squat_lv3"
+            android:defaultValue="35"
+            android:title="@string/exer_pacman_lv3_beans"
+            android:summary="@string/exer_pacman_lv3_summary"
+            android:inputType="number"
+            android:maxLength="2"
+            android:icon="@drawable/maze_c"
+            android:dialogIcon="@drawable/icon_lv3" />
+        <EditTextPreference
+            android:key="exer_pacman_squat_lv4"
+            android:defaultValue="45"
+            android:title="@string/exer_pacman_lv4_beans"
+            android:summary="@string/exer_pacman_lv4_summary"
+            android:inputType="number"
+            android:maxLength="2"
+            android:icon="@drawable/maze_d"
+            android:dialogIcon="@drawable/icon_lv4" />
+            
+    </PreferenceCategory>
+
+</PreferenceScreen>
