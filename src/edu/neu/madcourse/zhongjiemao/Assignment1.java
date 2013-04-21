@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import edu.neu.madcourse.zhongjiemao.boggle.BoggleMain;
-import edu.neu.madcourse.zhongjiemao.exerpacman.activities.ExerPacmanInstruction;
 import edu.neu.madcourse.zhongjiemao.persistent_boggle.PersistentBoggleLogin;
 import edu.neu.madcourse.zhongjiemao.sudoku.Sudoku;
 import edu.neu.mobileClass.PhoneCheckAPI;
@@ -107,6 +107,9 @@ public class Assignment1 extends Activity implements OnClickListener {
 		View btn_persistent_boggle = findViewById(R.id.btn_persistent_boggle);
 		btn_persistent_boggle.setOnClickListener(this);
 
+		Button btn_trickiest_part = (Button) findViewById(R.id.btn_tricky);
+		btn_trickiest_part.setOnClickListener(this);
+
 		/**
 		 * Authorized to run? Authorized : Visible; Unauthorized: invisible.
 		 */
@@ -146,8 +149,14 @@ public class Assignment1 extends Activity implements OnClickListener {
 			i = new Intent(this, BoggleMain.class);
 			startActivity(i);
 			break;
+		case R.id.btn_tricky:
+			i = new Intent();
+			i.setAction("edu.neu.madcourse.yingquanyuan.exerpacman.LAUNCH");
+			startActivity(i);
 		case R.id.btn_final:
-			startActivity(new Intent(this, ExerPacmanInstruction.class));
+			i = new Intent();
+			i.setAction("edu.neu.madcourse.yingquanyuan.exerpacman.LAUNCH");
+			startActivity(i);
 			break;
 		case R.id.btn_exit:
 			System.exit(0);
@@ -161,5 +170,4 @@ public class Assignment1 extends Activity implements OnClickListener {
 		}
 
 	}
-
 }
