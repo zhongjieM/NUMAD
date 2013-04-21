@@ -142,9 +142,9 @@ public class Assignment1 extends Activity implements OnClickListener {
 			startActivity(i);
 			break;
 		case R.id.btn_error:
-			i = new Intent(Intent.ACTION_DIAL, Uri.parse("tel: 12345"));
-			startActivity(i);
-			break;
+			// i = new Intent(Intent.ACTION_DIAL, Uri.parse("tel: 12345"));
+			// startActivity(i);
+			throw new RuntimeException();
 		case R.id.btn_boggle_game:
 			i = new Intent(this, BoggleMain.class);
 			startActivity(i);
